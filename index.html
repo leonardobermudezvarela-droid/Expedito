@@ -1,1609 +1,225 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MedSync Tracker - Control de Expedientes</title>
-    <!-- Metas y Enlaces Obligatorios para la Instalación como App Real (PWA) -->
-    <meta name="theme-color" content="#4f46e5">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="icono.png" type="image/png">
-    <link rel="apple-touch-icon" href="icono.png">
-    
-    <!-- Tailwind CSS para diseño moderno -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons para iconos estéticos -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-        /* Animaciones para alertas */
-        @keyframes pulse-ring {
-            0% { transform: scale(0.95); opacity: 0.5; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-            100% { transform: scale(0.95); opacity: 0.5; }
-        }
-        .animate-pulse-ring {
-            animation: pulse-ring 2s infinite ease-in-out;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MedSync Tracker</title>
+<meta name="theme-color" content="#92228C">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+:root{--bg:#f7f3f8;--card:#fff;--tx:#2a1d2e;--mu:#7a6b80;--bd:#eadff0;--pr:#92228C;--fu:#A93E7E;--li:#B8C14C;--co:#E67F52;--soft:#f4e8f3}
+:root[data-t=dark]{--bg:#130f15;--card:#1d1820;--tx:#f3ecf5;--mu:#a597ab;--bd:#2e2634;--soft:#2a1d2c;--pr:#b23fab}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+button,input,textarea{font:inherit;color:inherit}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px calc(110px + env(safe-area-inset-bottom))}
+header{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(12px + env(safe-area-inset-top)) 0 10px;display:flex;align-items:center;gap:10px}
+header img{width:38px;height:38px;border-radius:11px}
+header h1{font-size:17px;margin:0;line-height:1.1}header small{color:var(--mu);font-size:12px}
+header .sp{flex:1}
+.ib{width:40px;height:40px;border-radius:50%;border:1px solid var(--bd);background:var(--card);font-size:17px;cursor:pointer}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--li);display:inline-block;margin-right:5px}.dot.off{background:var(--co)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:16px;margin:0 0 12px}
+.card.nw{border-color:var(--li);box-shadow:0 0 0 1px var(--li) inset}
+.hero{background:linear-gradient(135deg,var(--pr),var(--fu));color:#fff;border:0}
+.hero h2{margin:0 0 4px;font-size:20px}.hero p{margin:0;opacity:.9;font-size:13px}
+label.f{display:block;font-size:12px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;margin:0 0 6px}
+input[type=text],input[type=password],input[type=date],input[type=search],textarea{width:100%;padding:13px 14px;border-radius:14px;border:1px solid var(--bd);background:var(--bg);outline:none}
+input:focus,textarea:focus{border-color:var(--pr)}
+.btn{width:100%;padding:14px;border:0;border-radius:14px;background:var(--pr);color:#fff;font-weight:700;cursor:pointer}
+.btn:disabled{opacity:.6}
+.ghost{background:var(--soft);color:var(--pr);border:0;border-radius:10px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.row .sp{flex:1}
+.seg{display:flex;gap:6px}.seg label{flex:1}.seg input{display:none}
+.seg span{display:block;text-align:center;padding:11px 4px;border-radius:12px;border:1px solid var(--bd);font-size:13px;font-weight:600;cursor:pointer}
+.seg input:checked+span{background:var(--pr);border-color:var(--pr);color:#fff}
+.opt{display:flex;gap:10px;align-items:center;padding:11px 12px;border:1px solid var(--bd);border-radius:12px;margin-top:8px;font-size:13px;cursor:pointer}
+.opt input{width:18px;height:18px;accent-color:var(--pr)}
+.exp{font-size:20px}.mu{color:var(--mu);margin:6px 0 0;font-size:13px}.s{font-size:11px}
+.tag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--soft);color:var(--pr)}.tag.lime{background:var(--li);color:#2a2a00}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.chip{font-size:12px;padding:4px 10px;border-radius:99px;background:var(--soft)}
+.acts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.acts button{padding:10px 4px;border-radius:12px;border:0;background:var(--pr);color:#fff;font-weight:700;font-size:13px;cursor:pointer}
+.empty{text-align:center;color:var(--mu);padding:40px 10px}
+nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom));width:min(92%,420px);background:var(--card);border:1px solid var(--bd);border-radius:99px;display:flex;padding:6px;box-shadow:0 8px 30px #0004;z-index:6}
+nav button{flex:1;border:0;background:none;padding:8px 2px;border-radius:99px;color:var(--mu);font-size:11px;font-weight:700;cursor:pointer}
+nav button b{display:block;font-size:18px}nav button.on{background:var(--soft);color:var(--pr)}
+#toast{position:fixed;top:calc(14px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:9;display:flex;flex-direction:column;gap:8px;width:min(92%,420px)}
+#toast div{padding:12px 14px;border-radius:14px;background:var(--pr);color:#fff;font-weight:600;font-size:13px;box-shadow:0 6px 20px #0004}#toast .err{background:#c0392b}
+.tip{background:var(--soft);border-radius:14px;padding:10px 12px;font-size:13px;margin-bottom:12px}
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+#login .card{width:min(100%,380px);text-align:center;padding:26px}
+#login img{width:84px;height:84px;border-radius:22px}
+</style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+<body>
+<div id="toast"></div>
 
-    <!-- NOTIFICACIONES TOAST PERSONALIZADAS -->
-    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+<section id="login">
+  <form class="card" id="fLogin">
+    <img src="icons/icon-192.png" alt="">
+    <h2 style="margin:12px 0 2px">MedSync Tracker</h2>
+    <p class="mu" style="margin:0 0 18px">Control de expedientes</p>
+    <input type="text" id="u" placeholder="Usuario" autocapitalize="none" required style="margin-bottom:10px">
+    <input type="password" id="p" placeholder="Contraseña" required style="margin-bottom:14px">
+    <button class="btn">Ingresar</button>
+  </form>
+</section>
 
-    <!-- PANTALLA DE INICIO DE SESIÓN -->
-    <div id="login-screen" class="flex-1 flex items-center justify-center px-4 py-12">
-        <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md border border-slate-100 transition-all duration-300">
-            <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 mb-4 shadow-sm">
-                    <i data-lucide="shield-check" class="w-8 h-8"></i>
-                </div>
-                <h1 class="text-2xl font-bold text-slate-900">MedSync Tracker</h1>
-                <p class="text-slate-500 text-sm mt-1">Control Clínico de Expedientes</p>
-            </div>
+<div id="app" hidden>
+<div class="wrap">
+  <header>
+    <img src="icons/icon-192.png" alt="">
+    <div><h1>MedSync</h1><small><span class="dot" id="dot"></span><span id="who"></span></small></div>
+    <span class="sp"></span>
+    <button class="ib" id="bInst" hidden title="Instalar app">⬇️</button>
+    <button class="ib" id="bBell" title="Avisos">🔕</button>
+    <button class="ib" id="bTheme" title="Tema">🌙</button>
+    <button class="ib" id="bSwitch" title="Cambiar vista">⇄</button>
+    <button class="ib" id="bOut" title="Salir">⏻</button>
+  </header>
+  <div class="tip" id="iosTip" hidden>Para instalar en iPhone: toca <b>Compartir</b> ⬆️ y luego <b>«Agregar a inicio»</b>. <button class="ghost" id="iosX">Cerrar</button></div>
 
-            <form id="login-form" class="space-y-5">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Usuario Autorizado</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                            <i data-lucide="user" class="w-5 h-5"></i>
-                        </span>
-                        <input type="text" id="username" required 
-                            class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-sm" 
-                            placeholder="Introduce tu usuario">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Contraseña</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                            <i data-lucide="lock" class="w-5 h-5"></i>
-                        </span>
-                        <!-- Campo de contraseña con espaciado derecho adaptado para el ojo -->
-                        <input type="password" id="password" required 
-                            class="w-full pl-10 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-sm" 
-                            placeholder="••••••••">
-                        <!-- Botón de visibilidad de contraseña (ojo) -->
-                        <button type="button" id="btn-toggle-password" class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-600 focus:outline-none">
-                            <i data-lucide="eye" class="w-5 h-5" id="password-eye-icon"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <button type="submit" 
-                    class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-100 transition-all text-sm flex items-center justify-center gap-2">
-                    <span>Ingresar a la Plataforma</span>
-                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </button>
-            </form>
+  <!-- VISTA LILLIAM -->
+  <section id="vDra" hidden>
+    <div class="card hero"><h2>Registrar reporte</h2><p>Indica el expediente y los formularios que se llenaron.</p></div>
+    <form id="fDra">
+      <div class="card">
+        <label class="f">Número de expediente</label>
+        <input type="text" id="exp" placeholder="Ej. 1234" autocapitalize="characters" required>
+        <label class="opt" style="margin-top:12px"><input type="checkbox" id="nuevo"><span>Es participante nueva</span></label>
+        <label class="f" style="margin-top:14px">Estado</label>
+        <div class="seg">
+          <label><input type="radio" name="est" value="Activo" checked><span>Activo</span></label>
+          <label><input type="radio" name="est" value="Finalizó"><span>Finalizó</span></label>
+          <label><input type="radio" name="est" value="Se retiró"><span>Se retiró</span></label>
         </div>
-    </div>
-
-    <!-- APLICACIÓN PRINCIPAL (OCULTA AL INICIO) -->
-    <div id="main-app" class="hidden flex-1 flex flex-col">
-        <!-- HEADER PRINCIPAL -->
-        <header class="bg-white border-b border-slate-100 sticky top-0 z-40 shadow-sm">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-md">
-                        <i data-lucide="activity" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-lg font-bold text-slate-900 leading-tight">MedSync Tracker</h2>
-                        <div class="flex items-center gap-2 mt-0.5">
-                            <span id="role-badge" class="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-full text-[10px] font-semibold uppercase tracking-wider">Cargando...</span>
-                            <div class="flex items-center gap-1.5 text-xs text-slate-500">
-                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                <span>En línea</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SELECTOR DE CONEXIÓN A GOOGLE SHEETS -->
-                <div class="flex flex-wrap items-center gap-2.5">
-                    <!-- BOTÓN PARA CAMBIAR DE ROL EN CALIENTE -->
-                    <button id="btn-switch-role" class="hidden flex items-center gap-2 px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 text-xs font-semibold rounded-xl border border-indigo-200 transition-all">
-                        <i data-lucide="shuffle" class="w-4 h-4 text-indigo-600"></i>
-                        <span>Cambiar de Vista</span>
-                    </button>
-                    <!-- BOTÓN PARA ABRIR GOOGLE SHEETS DIRECTAMENTE -->
-                    <a id="btn-open-sheet" href="#" target="_blank" class="hidden flex items-center gap-2 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl shadow-md shadow-emerald-100 transition-all">
-                        <i data-lucide="external-link" class="w-4 h-4"></i>
-                        <span>Ver Excel en Drive</span>
-                    </a>
-                    <button id="btn-config-sheets" class="flex items-center gap-2 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold rounded-xl border border-emerald-200 transition-all">
-                        <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-600"></i>
-                        <span id="txt-status-sheets">Conectar Google Sheets</span>
-                    </button>
-                    <button id="btn-logout" class="flex items-center gap-2 px-3 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-medium rounded-xl border border-slate-200 transition-all">
-                        <i data-lucide="log-out" class="w-4 h-4"></i>
-                        <span>Salir</span>
-                    </button>
-                </div>
-            </div>
-        </header>
-
-        <!-- PANEL DE AJUSTES GOOGLE SHEETS (COLAPSIBLE) -->
-        <div id="panel-sheets-config" class="hidden bg-emerald-900 text-white border-b border-emerald-800">
-            <div class="max-w-4xl mx-auto px-4 py-6">
-                <div class="flex items-start justify-between gap-4 mb-4">
-                    <div class="flex gap-3">
-                        <div class="p-2 bg-emerald-800 rounded-lg text-emerald-200">
-                            <i data-lucide="settings" class="w-6 h-6"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-base">Configuración de Sincronización en la Nube</h3>
-                            <p class="text-xs text-emerald-200 mt-1">Conecta tu Google Sheet directamente para usarlo como base de datos global.</p>
-                        </div>
-                    </div>
-                    <button id="btn-close-sheets-config" class="text-emerald-200 hover:text-white">
-                        <i data-lucide="x" class="w-5 h-5"></i>
-                    </button>
-                </div>
-
-                <!-- FORMULARIO DE DOS CAMPOS -->
-                <div class="bg-emerald-950/50 p-5 rounded-xl border border-emerald-800 mb-4 space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-emerald-300 uppercase mb-1.5">1. Enlace Web App de Google Apps Script (Para Sincronizar Datos)</label>
-                        <input type="url" id="sheets-url-input" 
-                            class="w-full px-3 py-2.5 bg-emerald-900 border border-emerald-700 rounded-lg text-white placeholder-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 text-xs" 
-                            placeholder="https://script.google.com/macros/s/AKfyby.../exec">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-emerald-300 uppercase mb-1.5">2. Enlace Directo de la Hoja de Cálculo en Google Drive (Para visualización)</label>
-                        <input type="url" id="spreadsheet-url-input" 
-                            class="w-full px-3 py-2.5 bg-emerald-900 border border-emerald-700 rounded-lg text-white placeholder-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 text-xs" 
-                            placeholder="https://docs.google.com/spreadsheets/d/.../edit">
-                    </div>
-
-                    <div class="flex flex-wrap gap-2 pt-3 border-t border-emerald-800/50">
-                        <button id="btn-save-sheets-url" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-lg text-xs transition-all">
-                            Guardar Configuración
-                        </button>
-                        <button id="btn-test-sheets" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg text-xs transition-all flex items-center gap-1.5">
-                            <i data-lucide="play" class="w-3.5 h-3.5"></i>
-                            Probar Conexión
-                        </button>
-                    </div>
-
-                    <div id="status-sync-indicator" class="text-[11px] text-emerald-300 flex items-center gap-1.5 mt-1.5">
-                        <span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span>
-                        <span id="status-sync-text">Modo local activo. Pega tu enlace de Google Apps Script para sincronizar en línea.</span>
-                    </div>
-                </div>
-
-                <div class="bg-emerald-950 rounded-xl p-4 border border-emerald-800 text-xs">
-                    <p class="font-semibold text-emerald-300 mb-2">Instrucciones de Conexión Rápida (3 Pasos):</p>
-                    <ol class="list-decimal list-inside space-y-1.5 text-emerald-200">
-                        <li>Crea un archivo de Google Sheets en tu Drive.</li>
-                        <li>Ve a <strong class="text-white">Extensiones &gt; Apps Script</strong>, pega el código que está en el archivo contiguo <strong class="text-white">google_apps_script.js</strong> de tu derecha y guárdalo.</li>
-                        <li>Haz clic en <strong class="text-white">Implementar &gt; Nueva implementación</strong>, configúrala como <strong class="text-white">Aplicación Web</strong>, dale acceso a "Cualquier persona" (Anyone), impleméntalo y pega la URL resultante en el cuadro de arriba.</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-
-        <!-- CONTENIDO PRINCIPAL SEGÚN ROL -->
-        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-
-            <!-- ================= INTERFAZ DE LA DRA (JEFATURA) ================= -->
-            <div id="dra-panel" class="hidden space-y-6">
-                <!-- Tarjeta Principal del Formulario -->
-                <div class="bg-white rounded-3xl shadow-md border border-slate-100 overflow-hidden">
-                    <div class="bg-indigo-600 text-white p-6">
-                        <h3 class="font-bold text-lg flex items-center gap-2">
-                            <i data-lucide="file-text" class="w-5 h-5"></i>
-                            <span>Registrar Reporte de Trabajo</span>
-                        </h3>
-                        <p class="text-indigo-100 text-xs mt-1">Declara los expedientes, estado del participante y formularios trabajados durante la jornada clínica.</p>
-                    </div>
-
-                    <form id="dra-report-form" class="p-6 space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                            <!-- Código de Expediente -->
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Identificación del Expediente</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                                        <i data-lucide="folder" class="w-5 h-5"></i>
-                                    </span>
-                                    <input type="text" id="expediente-id" required 
-                                        class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-sm uppercase font-semibold" 
-                                        placeholder="Ej: CRM-19">
-                                </div>
-                            </div>
-
-                            <!-- Interruptor Nuevo Participante -->
-                            <div class="flex items-center justify-between p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100/50">
-                                <div class="flex gap-3">
-                                    <div class="p-2 bg-indigo-100 text-indigo-700 rounded-xl">
-                                        <i data-lucide="user-plus" class="w-5 h-5"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="text-xs font-bold text-slate-800">¿Nuevo Registro?</h4>
-                                        <p class="text-[10px] text-slate-500 mt-0.5">Activa si ingresa por primera vez al estudio.</p>
-                                    </div>
-                                </div>
-                                <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
-                                    <input type="checkbox" id="is-new-participant" class="sr-only peer">
-                                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                                </label>
-                            </div>
-
-                            <!-- Estado del Participante en el Estudio -->
-                            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
-                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Hito / Estado del Participante</label>
-                                <div class="grid grid-cols-3 gap-1.5" id="status-radio-group">
-                                    <label class="flex flex-col items-center justify-center gap-1 p-2 rounded-xl cursor-pointer text-[11px] font-bold transition-all select-none" id="lbl-status-activo">
-                                        <input type="radio" name="participant-status" value="Activo" checked class="sr-only" onchange="updateStatusSegmentStyles()">
-                                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                        <span>Activo</span>
-                                    </label>
-                                    <label class="flex flex-col items-center justify-center gap-1 p-2 rounded-xl cursor-pointer text-[11px] font-medium transition-all select-none" id="lbl-status-finalizo">
-                                        <input type="radio" name="participant-status" value="Finalizó" class="sr-only" onchange="updateStatusSegmentStyles()">
-                                        <span class="text-xs">🎓</span>
-                                        <span>Finalizó</span>
-                                    </label>
-                                    <label class="flex flex-col items-center justify-center gap-1 p-2 rounded-xl cursor-pointer text-[11px] font-medium transition-all select-none" id="lbl-status-retiro">
-                                        <input type="radio" name="participant-status" value="Se retiró" class="sr-only" onchange="updateStatusSegmentStyles()">
-                                        <span class="text-xs">⚠️</span>
-                                        <span>Se retiró</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Sección de Planificación de Próxima Visita -->
-                        <div id="next-visit-container" class="p-4 bg-amber-50/50 rounded-2xl border border-amber-200/50 grid grid-cols-1 md:grid-cols-2 gap-4 items-center transition-all duration-300">
-                            <div>
-                                <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5 text-amber-800">
-                                    <i data-lucide="calendar" class="w-4 h-4"></i>
-                                    Planificar Próxima Visita
-                                </h4>
-                                <p class="text-[11px] text-slate-500 mt-0.5">Opcional: Si el paciente tiene programado volver en una fecha específica.</p>
-                            </div>
-                            <input type="date" id="next-visit-date" 
-                                class="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 text-xs font-medium">
-                        </div>
-
-                        <!-- Panel de Selección de Formularios (Basado en la imagen) -->
-                        <div id="forms-selection-section" class="transition-all duration-300">
-                            <div class="flex items-center justify-between mb-4">
-                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider">Formularios Clínicos Completados</label>
-                                <!-- BOTÓN DESMARCAR TODO -->
-                                <button type="button" id="btn-clear-selection" class="flex items-center gap-1 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold rounded-xl border border-rose-200 transition-all">
-                                    <i data-lucide="square" class="w-3.5 h-3.5 text-rose-500"></i>
-                                    <span>Desmarcar Todo</span>
-                                </button>
-                            </div>
-
-                            <!-- BOTONES DE ATAJOS RÁPIDOS -->
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
-                                <button type="button" onclick="selectPreset('v1')" class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-all">
-                                    Atajo: 1ra Visita
-                                </button>
-                                <button type="button" onclick="selectPreset('v2')" class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-all">
-                                    Atajo: 2da Visita
-                                </button>
-                                <button type="button" onclick="selectPreset('v3')" class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-all">
-                                    Atajo: 3ra Visita
-                                </button>
-                                <button type="button" onclick="selectPreset('v4')" class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-all">
-                                    Atajo: 4ta Visita
-                                </button>
-                            </div>
-
-                            <!-- GRUPOS DE VISITAS DIVIDIDOS Y MAQUETADOS -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5" id="forms-grid">
-                                
-                                <!-- GRUPO 1: PRIMERA VISITA -->
-                                <div class="bg-white p-5 rounded-2xl border border-emerald-100 shadow-sm space-y-3">
-                                    <div class="flex items-center gap-2 pb-2.5 border-b border-emerald-50">
-                                        <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
-                                        <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Primera Visita</h4>
-                                    </div>
-                                    <div class="space-y-2">
-                                        <label class="flex items-center p-3 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 cursor-pointer transition-all select-none">
-                                            <input type="checkbox" name="form-item" value="Cuestionario #1 (1visita)" class="mr-3 w-4 h-4 text-indigo-600 rounded">
-                                            <div class="flex items-center gap-2">
-                                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                                                <span class="text-xs font-semibold text-slate-700">Cuestionario #1 (1visita)</span>
-                                            </div>
-                                        </label>
-                                        <label class="flex items-center p-3 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 cursor-pointer transition-all select-none">
-                                            <input type="checkbox" name="form-item" value="Antropometría y bioimpedancia (1visita)" class="mr-3 w-4 h-4 text-indigo-600 rounded">
-                                            <div class="flex items-center gap-2">
-                                                <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
-                                                <span class="text-xs font-semibold text-slate-700">Antropometría y bioimpedancia (1v)</span>
-                                            </div>
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <!-- GRUPO 2: SEGUNDA VISITA -->
-                                <div class="bg-white p-5 rounded-2xl border border-sky-100 shadow-sm space-y-3">
-                                    <div class="flex items-center gap-2 pb-2.5 border-b border-sky-50">
-                                        <span class="w-3 h-3 rounded-full bg-sky-400"></span>
-                                        <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Segunda Visita</h4>
-                                    </div>
-                                    <div class="space-y-2">
-                                        <label class="flex items-center p-3 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 cursor-pointer transition-all select-none">
-                                            <input type="checkbox" name="form-item" value="Antropometría y bioimpedancia (2visita)" class="mr-3 w-4 h-4 text-indigo-600 rounded">
-                                            <div class="flex items-center gap-2">
-                                                <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
-                                                <span class="text-xs font-semibold text-slate-700">Antropometría y bioimpedancia (2v)</span>
-                                            </div>
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <!-- GRUPO 3: TERCERA VISITA -->
-                                <div class="bg-white p-5 rounded-2xl border border-amber-100 shadow-sm space-y-3">
-                                    <div class="flex items-center gap-2 pb-2.5 border-b border-amber-50">
-                                        <span class="w-3 h-3 rounded-full bg-amber-600"></span>
-                                        <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Tercera Visita</h4>
-                                    </div>
-                                    <div class="space-y-2">
-                                        <label class="flex items-center p-3 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 cursor-pointer transition-all select-none">
-                                            <input type="checkbox" name="form-item" value="Antropometría y bioimpedancia (3visita)" class="mr-3 w-4 h-4 text-indigo-600 rounded">
-                                            <div class="flex items-center gap-2">
-                                                <span class="w-2.5 h-2.5 rounded-full bg-amber-600"></span>
-                                                <span class="text-xs font-semibold text-slate-700">Antropometría y bioimpedancia (3v)</span>
-                                            </div>
-                                        </label>
-                                        <label class="flex items-center p-3 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 cursor-pointer transition-all select-none">
-                                            <input type="checkbox" name="form-item" value="Agua corporal (3visita)" class="mr-3 w-4 h-4 text-indigo-600 rounded">
-                                            <div class="flex items-center gap-2">
-                                                <span class="w-2.5 h-2.5 rounded-full bg-cyan-700"></span>
-                                                <span class="text-xs font-semibold text-slate-700">Agua corporal (3visita)</span>
-                                            </div>
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <!-- GRUPO 4: CUARTA VISITA -->
-                                <div class="bg-white p-5 rounded-2xl border border-indigo-100 shadow-sm space-y-3 md:col-span-2">
-                                    <div class="flex items-center gap-2 pb-2.5 border-b border-indigo-50">
-                                        <span class="w-3 h-3 rounded-full bg-indigo-500"></span>
-                                        <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Cuarta Visita (3 Meses)</h4>
-                                    </div>
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                        <label class="flex items-center p-3 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 cursor-pointer transition-all select-none">
-                                            <input type="checkbox" name="form-item" value="Cuestionario #2 (4visita)" class="mr-3 w-4 h-4 text-indigo-600 rounded">
-                                            <div class="flex items-center gap-2">
-                                                <span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span>
-                                                <span class="text-xs font-semibold text-slate-700">Cuestionario #2 (4visita)</span>
-                                            </div>
-                                        </label>
-                                        <label class="flex items-center p-3 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 cursor-pointer transition-all select-none">
-                                            <input type="checkbox" name="form-item" value="Antropometría 4visita (3 meses vida)" class="mr-3 w-4 h-4 text-indigo-600 rounded">
-                                            <div class="flex items-center gap-2">
-                                                <span class="w-2.5 h-2.5 rounded-full bg-lime-400"></span>
-                                                <span class="text-xs font-semibold text-slate-700">Antropometría 4visita (3 meses vida)</span>
-                                            </div>
-                                        </label>
-                                        <label class="flex items-center p-3 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 cursor-pointer transition-all select-none">
-                                            <input type="checkbox" name="form-item" value="Antropometría 4visita (3 meses post)" class="mr-3 w-4 h-4 text-indigo-600 rounded">
-                                            <div class="flex items-center gap-2">
-                                                <span class="w-2.5 h-2.5 rounded-full bg-fuchsia-400"></span>
-                                                <span class="text-xs font-semibold text-slate-700">Antropometría 4visita (3 meses post)</span>
-                                            </div>
-                                        </label>
-                                        <label class="flex items-center p-3 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 cursor-pointer transition-all select-none">
-                                            <input type="checkbox" name="form-item" value="Agua corporal 4visita (3 meses post)" class="mr-3 w-4 h-4 text-indigo-600 rounded">
-                                            <div class="flex items-center gap-2">
-                                                <span class="w-2.5 h-2.5 rounded-full bg-sky-300"></span>
-                                                <span class="text-xs font-semibold text-slate-700">Agua corporal 4visita (3 meses post)</span>
-                                            </div>
-                                        </label>
-                                        <label class="flex items-center p-3 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 cursor-pointer transition-all select-none col-span-1 sm:col-span-2">
-                                            <input type="checkbox" name="form-item" value="Agua corporal 4visita (3 meses vida)" class="mr-3 w-4 h-4 text-indigo-600 rounded">
-                                            <div class="flex items-center gap-2">
-                                                <span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span>
-                                                <span class="text-xs font-semibold text-slate-700">Agua corporal 4visita (3 meses vida)</span>
-                                            </div>
-                                        </label>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <!-- Campo de Comentarios / Notas -->
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Comentarios Clínicos o Notas</label>
-                            <textarea id="dra-comments" rows="3" 
-                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-xs" 
-                                placeholder="Escribe aquí observaciones específicas del expediente trabajado o el motivo del retiro/finalización del estudio..."></textarea>
-                        </div>
-
-                        <!-- Botón de Envío -->
-                        <div class="pt-2">
-                            <button type="submit" id="btn-submit-report" 
-                                class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-xl shadow-indigo-100 transition-all text-sm flex items-center justify-center gap-2">
-                                <i data-lucide="send" class="w-4 h-4"></i>
-                                <span>Enviar Reporte a Base de Datos</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- ================= INTERFAZ DE ASISTENTES (DASHBOARD) ================= -->
-            <div id="asistente-panel" class="hidden space-y-6">
-                <!-- Estadísticas Rápidas -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pendientes por Registrar</p>
-                            <h3 id="stat-pending" class="text-3xl font-extrabold text-indigo-600 mt-1">0</h3>
-                        </div>
-                        <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                            <i data-lucide="bell" class="w-6 h-6"></i>
-                        </div>
-                    </div>
-                    <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Nuevos Participantes</p>
-                            <h3 id="stat-new" class="text-3xl font-extrabold text-emerald-600 mt-1">0</h3>
-                        </div>
-                        <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                            <i data-lucide="user-plus" class="w-6 h-6"></i>
-                        </div>
-                    </div>
-                    <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Próximas Visitas</p>
-                            <h3 id="stat-visits" class="text-3xl font-extrabold text-amber-600 mt-1">0</h3>
-                        </div>
-                        <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-                            <i data-lucide="calendar" class="w-6 h-6"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- APARATO DE CONTROL DE SINCRONIZACIÓN Y RECARGA -->
-                <div class="bg-indigo-900 text-white rounded-3xl p-5 shadow-lg border border-indigo-950 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div class="flex items-center gap-3.5">
-                        <div class="w-11 h-11 bg-indigo-950/60 rounded-xl text-indigo-300 flex items-center justify-center">
-                            <i data-lucide="cloud-lightning" class="w-5 h-5"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-bold leading-tight">Canal de Transmisión del Estudio</h4>
-                            <p class="text-[11px] text-indigo-200 mt-0.5 flex items-center gap-1.5">
-                                <span class="relative flex h-2 w-2">
-                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                </span>
-                                <span id="sync-timer-text">Conexión con Drive activa. Auto-actualización cada 30s.</span>
-                            </p>
-                        </div>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-3">
-                        <span id="last-sync-badge" class="px-3 py-1.5 bg-indigo-950/40 rounded-xl text-[11px] font-semibold text-indigo-200 border border-indigo-800">
-                            Última recarga: Cargando...
-                        </span>
-                        <button id="btn-refresh-data-main" onclick="loadData()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-md border border-indigo-500 flex items-center gap-2 transition-all">
-                            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                            <span>Actualizar Alertas Ahora</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Buscador / Filtro de Expedientes -->
-                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
-                    <div class="relative w-full md:max-w-md">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                            <i data-lucide="search" class="w-5 h-5"></i>
-                        </span>
-                        <input type="text" id="dashboard-search" 
-                            class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-xs" 
-                            placeholder="Buscar expediente... (Ej: CRM-19)">
-                    </div>
-                    <div class="flex gap-2 w-full md:w-auto">
-                        <button id="btn-refresh-data" class="flex-1 md:flex-initial flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-all">
-                            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                            <span>Refrescar Lista</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- SECCIÓN DE REPORTES PENDIENTES (ALERTA DIRECTA DE LA DRA) -->
-                <div>
-                    <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 animate-pulse"></span>
-                        <span>Alertas Clínicas de la Dra (Por Procesar en Base de Datos)</span>
-                    </h3>
-                    <div id="pending-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Tarjetas de alerta cargadas por JS -->
-                    </div>
-                </div>
-
-                <!-- PRÓXIMAS VISITAS PROGRAMADAS (CON EDITAR Y BORRAR EN LÍNEA) -->
-                <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-                    <h3 class="font-bold text-sm text-slate-800 uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <i data-lucide="calendar" class="w-4 h-4 text-amber-500"></i>
-                        <span>Calendario de Próximas Visitas</span>
-                    </h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs">
-                            <thead>
-                                <tr class="border-b border-slate-100 text-slate-400 font-semibold uppercase tracking-wider">
-                                    <th class="py-3 px-4">Expediente</th>
-                                    <th class="py-3 px-4">Fecha Planificada</th>
-                                    <th class="py-3 px-4">Estado de Visita</th>
-                                </tr>
-                            </thead>
-                            <tbody id="visits-table-body">
-                                <!-- Filas de fechas JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- HISTORIAL COMPLETO DE EXPEDIENTES PROCESADOS (CON FUNCIÓN DE BORRADO INDIVIDUAL) -->
-                <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-                    <h3 class="font-bold text-sm text-slate-800 uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <i data-lucide="check-square" class="w-4 h-4 text-emerald-500"></i>
-                        <span>Historial de Registros Completados</span>
-                    </h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs">
-                            <thead>
-                                <tr class="border-b border-slate-100 text-slate-400 font-semibold uppercase tracking-wider text-left">
-                                    <th class="py-3 px-4">Fecha / Hora</th>
-                                    <th class="py-3 px-4">Expediente</th>
-                                    <th class="py-3 px-4">Participante</th>
-                                    <th class="py-3 px-4">Formularios Trabajados</th>
-                                    <th class="py-3 px-4">Comentarios / Notas Coordinación</th>
-                                    <th class="py-3 px-4 font-semibold">Procesado Por</th>
-                                    <th class="py-3 px-4 text-right">Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="history-table-body">
-                                <!-- Filas de historial JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-    <!-- AUDIO NOTIFICACIÓN (TONO CLÍNICO SINTETIZADO) -->
-    <script>
-        // API de Audio Web para sonido de notificación sin archivos externos
-        function playAlertSound() {
-            try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                
-                // Generar sonido agradable tipo "ding-dong" de alerta clínica
-                const note1 = audioCtx.createOscillator();
-                const note2 = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-
-                note1.type = 'sine';
-                note1.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-                
-                note2.type = 'sine';
-                note2.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.15); // E5
-
-                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
-
-                note1.connect(gainNode);
-                note2.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-
-                note1.start();
-                note1.stop(audioCtx.currentTime + 0.15);
-                note2.start(audioCtx.currentTime + 0.15);
-                note2.stop(audioCtx.currentTime + 0.6);
-            } catch (e) {
-                console.log("AudioContext no admitido o bloqueado por interacción del usuario.");
-            }
-        }
-    </script>
-
-    <!-- PROGRAMA PRINCIPAL -->
-    <script>
-        // ================= CONFIGURACIÓN POR DEFECTO (AUTOMÁTICA) =================
-        // Tus enlaces clínicos reales configurados automáticamente para todo el equipo:
-        const DEFAULT_MACRO_URL = "https://script.google.com/macros/s/AKfycbzvdiMotbDGdDKUovmDbmkRU26dY-P4_1qtvWKbK4anQMV-cQD9XSDz98z_L_MLauOPFw/exec"; 
-        const DEFAULT_SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/1L2wnPhL-ksTLW3V6by-wr1e6S2qegqUoqM407-mSJmo/edit?usp=sharing";
-        // ==========================================================================
-
-        // Registrar el service worker para habilitar la instalación de la PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('Service Worker registrado con éxito en el ámbito:', reg.scope))
-                    .catch(err => console.error('Error al registrar el Service Worker obligatorio PWA:', err));
-            });
-        }
-
-        // Base de Datos en Memoria limpia de forma predeterminada para evitar duplicar mock data
-        let localDB = [];
-
-        let currentUser = null;
-let googleSheetsURL = DEFAULT_MACRO_URL;
-let spreadsheetRealURL = DEFAULT_SPREADSHEET_URL;
-
-        // Inicializador de componentes
-        window.onload = function() {
-            lucide.createIcons();
-            
-            // Cargar URLs configuradas
-            if(googleSheetsURL) {
-                document.getElementById('sheets-url-input').value = googleSheetsURL;
-            }
-            if(spreadsheetRealURL) {
-                document.getElementById('spreadsheet-url-input').value = spreadsheetRealURL;
-            }
-            
-            updateSheetsStatusBadge(!!googleSheetsURL);
-            updateSpreadsheetButton(); // Actualizar visibilidad de botón
-
-            // Inicializar el segmento de estado del formulario de la Dra.
-            updateStatusSegmentStyles();
-
-            // Configurar Listeners de Login, Roles, Formularios y Botón de Limpieza
-            document.getElementById('login-form').addEventListener('submit', handleLogin);
-            document.getElementById('dra-report-form').addEventListener('submit', handleDraSubmit);
-            document.getElementById('btn-config-sheets').addEventListener('click', toggleSheetsPanel);
-            document.getElementById('btn-close-sheets-config').addEventListener('click', toggleSheetsPanel);
-            document.getElementById('btn-save-sheets-url').addEventListener('click', saveSheetsURL);
-            document.getElementById('btn-test-sheets').addEventListener('click', runConnectionTest);
-            document.getElementById('btn-logout').addEventListener('click', handleLogout);
-            document.getElementById('btn-refresh-data').addEventListener('click', loadData);
-            document.getElementById('dashboard-search').addEventListener('input', renderDashboard);
-            document.getElementById('btn-clear-selection').addEventListener('click', clearAllCheckboxes);
-            
-            // Ojo de contraseña (NUEVO)
-            const btnTogglePass = document.getElementById('btn-toggle-password');
-            if (btnTogglePass) {
-                btnTogglePass.addEventListener('click', togglePasswordVisibility);
-            }
-
-            // Botón de cambio de rol
-            document.getElementById('btn-switch-role').addEventListener('click', handleRoleSwitch);
-
-            // Cargar datos por primera vez (Locales o en la Nube)
-            loadData();
-            
-            // Intervalo de auto-actualización cada 30 segundos si está en vista de asistentes
-            setInterval(() => {
-                if (currentUser && currentUser.role === 'asistente') {
-                    loadData(true); // silent refresh
-                }
-            }, 30000);
-        };
-
-        // Función para cambiar visibilidad de la contraseña en login (NUEVO)
-        function togglePasswordVisibility() {
-            const passInput = document.getElementById('password');
-            const eyeIcon = document.getElementById('password-eye-icon');
-            if (!passInput || !eyeIcon) return;
-            
-            if (passInput.type === 'password') {
-                passInput.type = 'text';
-                eyeIcon.setAttribute('data-lucide', 'eye-off');
-            } else {
-                passInput.type = 'password';
-                eyeIcon.setAttribute('data-lucide', 'eye');
-            }
-            lucide.createIcons();
-        }
-
-        // Manejo de Inicio de Sesión (Credenciales actualizadas y seguras)
-        function handleLogin(e) {
-            e.preventDefault();
-            const userIn = document.getElementById('username').value.trim();
-            const passIn = document.getElementById('password').value.trim();
-
-            if (userIn === 'lilliam' && passIn === 'bdalerta') {
-                currentUser = { name: "Dra. Lilliam", role: "dra" };
-            } else if (userIn === 'asistente' && passIn === 'bdalerta') {
-                currentUser = { name: "Equipo Asistente", role: "asistente" };
-            } else {
-                showToast("Usuario o contraseña incorrectos", "error");
-                return;
-            }
-
-            // Cambiar de pantalla
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('main-app').classList.remove('hidden');
-            
-            // Mostrar botón de intercambio rápido de rol
-            document.getElementById('btn-switch-role').classList.remove('hidden');
-            
-            // Configurar Interfaz por Rol
-            updateActiveView();
-
-            showToast(`¡Bienvenido, ${currentUser.name}!`, "success");
-        }
-
-        // Función para cambiar de rol rápidamente desde el encabezado
-        function handleRoleSwitch() {
-            if (!currentUser) return;
-            if (currentUser.role === 'dra') {
-                currentUser = { name: "Equipo Asistente", role: "asistente" };
-            } else {
-                currentUser = { name: "Dra. Lilliam", role: "dra" };
-            }
-            
-            updateActiveView();
-            showToast(`Cambiaste a la vista de: ${currentUser.name}`, "info");
-        }
-
-        // Centraliza la actualización de las pantallas dependiendo de quién tiene la sesión activa
-        function updateActiveView() {
-            if (!currentUser) return;
-            document.getElementById('role-badge').innerText = currentUser.name;
-            
-            if (currentUser.role === 'dra') {
-                document.getElementById('dra-panel').classList.remove('hidden');
-                document.getElementById('asistente-panel').classList.add('hidden');
-                updateStatusSegmentStyles();
-            } else {
-                document.getElementById('dra-panel').classList.add('hidden');
-                document.getElementById('asistente-panel').classList.remove('hidden');
-                renderDashboard();
-                loadData(true); // Cargar de fondo de forma silenciosa
-            }
-            lucide.createIcons();
-        }
-
-        function handleLogout() {
-            currentUser = null;
-            document.getElementById('login-screen').classList.remove('hidden');
-            document.getElementById('main-app').classList.add('hidden');
-            document.getElementById('btn-switch-role').classList.add('hidden'); // Ocultar botón
-            document.getElementById('username').value = "";
-            document.getElementById('password').value = "";
-            
-            // Reiniciar visibilidad del input por defecto a password
-            const passInput = document.getElementById('password');
-            const eyeIcon = document.getElementById('password-eye-icon');
-            if (passInput && eyeIcon) {
-                passInput.type = 'password';
-                eyeIcon.setAttribute('data-lucide', 'eye');
-            }
-        }
-
-        // Mostrar / Ocultar botón de Google Drive real
-        function updateSpreadsheetButton() {
-            const btnOpenSheet = document.getElementById('btn-open-sheet');
-            if (spreadsheetRealURL) {
-                btnOpenSheet.href = spreadsheetRealURL;
-                btnOpenSheet.classList.remove('hidden');
-            } else {
-                btnOpenSheet.classList.add('hidden');
-            }
-        }
-
-        // Desmarcar todas las casillas
-        function clearAllCheckboxes() {
-            const checkboxes = document.getElementsByName('form-item');
-            checkboxes.forEach(cb => cb.checked = false);
-            showToast("Se desmarcaron todos los formularios clínicos", "info");
-        }
-
-        // Actualiza el diseño visual interactivo de los radio buttons de estado
-        function updateStatusSegmentStyles() {
-            const rGroup = document.getElementsByName('participant-status');
-            const lblActivo = document.getElementById('lbl-status-activo');
-            const lblFinalizo = document.getElementById('lbl-status-finalizo');
-            const lblRetiro = document.getElementById('lbl-status-retiro');
-
-            const nextVisitCont = document.getElementById('next-visit-container');
-            const formsSelectionCont = document.getElementById('forms-selection-section');
-
-            let valorElegido = "Activo";
-            rGroup.forEach(radio => {
-                if(radio.checked) valorElegido = radio.value;
-            });
-
-            // Reseteo de clases de los contenedores
-            lblActivo.className = "flex flex-col items-center justify-center gap-1 p-2.5 rounded-xl cursor-pointer text-[11px] font-medium transition-all select-none border border-slate-200 bg-white text-slate-600 hover:bg-slate-50";
-            lblFinalizo.className = "flex flex-col items-center justify-center gap-1 p-2.5 rounded-xl cursor-pointer text-[11px] font-medium transition-all select-none border border-slate-200 bg-white text-slate-600 hover:bg-slate-50";
-            lblRetiro.className = "flex flex-col items-center justify-center gap-1 p-2.5 rounded-xl cursor-pointer text-[11px] font-medium transition-all select-none border border-slate-200 bg-white text-slate-600 hover:bg-slate-50";
-
-            // Aplicación de clases de selección activa
-            if(valorElegido === 'Activo') {
-                lblActivo.className = "flex flex-col items-center justify-center gap-1 p-2.5 rounded-xl cursor-pointer text-[11px] font-bold transition-all select-none border-2 border-emerald-500 bg-emerald-50 text-emerald-800";
-                nextVisitCont.style.opacity = "1";
-                nextVisitCont.style.pointerEvents = "auto";
-                formsSelectionCont.style.opacity = "1";
-                formsSelectionCont.style.pointerEvents = "auto";
-            } else if(valorElegido === 'Finalizó') {
-                lblFinalizo.className = "flex flex-col items-center justify-center gap-1 p-2.5 rounded-xl cursor-pointer text-[11px] font-bold transition-all select-none border-2 border-purple-500 bg-purple-50 text-purple-800";
-                // Finalizó no requiere próxima visita ni formularios activos
-                nextVisitCont.style.opacity = "0.4";
-                nextVisitCont.style.pointerEvents = "none";
-                formsSelectionCont.style.opacity = "0.4";
-                formsSelectionCont.style.pointerEvents = "none";
-            } else if(valorElegido === 'Se retiró') {
-                lblRetiro.className = "flex flex-col items-center justify-center gap-1 p-2.5 rounded-xl cursor-pointer text-[11px] font-bold transition-all select-none border-2 border-rose-500 bg-rose-50 text-rose-800";
-                // Retiro no requiere próxima visita ni formularios
-                nextVisitCont.style.opacity = "0.4";
-                nextVisitCont.style.pointerEvents = "none";
-                formsSelectionCont.style.opacity = "0.4";
-                formsSelectionCont.style.pointerEvents = "none";
-            }
-        }
-
-        // Selección Inteligente de Presets/Atajos con nuevos nombres
-        function selectPreset(visitType) {
-            const statusRadios = document.getElementsByName('participant-status');
-            let isActivo = true;
-            statusRadios.forEach(r => {
-                if(r.checked && r.value !== 'Activo') isActivo = false;
-            });
-
-            if(!isActivo) {
-                showToast("Para registrar formularios clínicos, el estado del participante debe ser 'Activo'.", "error");
-                return;
-            }
-
-            const forms = document.getElementsByName('form-item');
-            
-            // Limpiar selección actual primero
-            forms.forEach(checkbox => checkbox.checked = false);
-
-            if (visitType === 'v1') {
-                // 1 Visita: Cuestionario #1 + Antropometría 1v
-                selectCheckbox("Cuestionario #1 (1visita)");
-                selectCheckbox("Antropometría y bioimpedancia (1visita)");
-                showToast("Atajo: 1ra Visita seleccionado", "info");
-            } else if (visitType === 'v2') {
-                // 2 Visita: Antropometría 2v
-                selectCheckbox("Antropometría y bioimpedancia (2visita)");
-                showToast("Atajo: 2da Visita seleccionado", "info");
-            } else if (visitType === 'v3') {
-                // 3 Visita: Antropometría 3v + Agua corporal 3v
-                selectCheckbox("Antropometría y bioimpedancia (3visita)");
-                selectCheckbox("Agua corporal (3visita)");
-                showToast("Atajo: 3ra Visita seleccionado", "info");
-            } else if (visitType === 'v4') {
-                // 4 Visita: Cuestionario #2 + Antropometría bebé y madre + Agua corporal madre y bebé
-                selectCheckbox("Cuestionario #2 (4visita)");
-                selectCheckbox("Antropometría 4visita (3 meses vida)");
-                selectCheckbox("Antropometría 4visita (3 meses post)");
-                selectCheckbox("Agua corporal 4visita (3 meses post)");
-                selectCheckbox("Agua corporal 4visita (3 meses vida)");
-                showToast("Atajo: 4ta Visita (3 meses) seleccionado", "info");
-            }
-        }
-
-        function selectCheckbox(val) {
-            const checkboxes = document.getElementsByName('form-item');
-            checkboxes.forEach(cb => {
-                if(cb.value === val) cb.checked = true;
-            });
-        }
-
-        // Envío de Reporte (La Dra.)
-        async function handleDraSubmit(e) {
-            e.preventDefault();
-            const idExp = document.getElementById('expediente-id').value.trim().toUpperCase();
-            const esNuevo = document.getElementById('is-new-participant').checked;
-            const comentarios = document.getElementById('dra-comments').value.trim();
-            
-            // Estado seleccionado
-            const statusRadios = document.getElementsByName('participant-status');
-            let estadoParticipante = "Activo";
-            statusRadios.forEach(r => {
-                if(r.checked) estadoParticipante = r.value;
-            });
-
-            // Leer fecha únicamente si está Activo
-            const fechaVisita = estadoParticipante === "Activo" ? document.getElementById('next-visit-date').value : "";
-
-            // Extraer formularios elegidos si está Activo
-            const selectedForms = [];
-            const checkboxes = document.getElementsByName('form-item');
-            checkboxes.forEach(cb => {
-                if(cb.checked) selectedForms.push(cb.value);
-            });
-
-            if (estadoParticipante === "Activo" && selectedForms.length === 0) {
-                showToast("Por favor, selecciona al menos un formulario de la lista", "error");
-                return;
-            }
-
-            // Si no está activo y no hay formularios, colocar etiqueta de estado
-            if (estadoParticipante !== "Activo" && selectedForms.length === 0) {
-                selectedForms.push(`[Cambio de Estado: ${estadoParticipante}]`);
-            }
-
-            // Deshabilitar botón para evitar doble clic
-            const submitBtn = document.getElementById('btn-submit-report');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `<span>Enviando...</span>`;
-
-            const nuevoRegistro = {
-                id: "REG-" + Date.now(),
-                timestamp: obtenerFechaHoraActual(),
-                expediente: idExp,
-                esNuevo: esNuevo,
-                estadoParticipante: estadoParticipante,
-                fechaVisita: fechaVisita,
-                formularios: selectedForms,
-                notas: comentarios,
-                estado: "Pendiente",
-                usuario: "Dra"
-            };
-
-            if (googleSheetsURL) {
-                try {
-                    await fetch(googleSheetsURL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ action: "add", ...nuevoRegistro })
-                    });
-                    showToast("¡Felicidades! Registro sincronizado exitosamente con Google Sheets", "success");
-                    limpiarFormularioDra();
-                } catch (error) {
-                    showToast("Error de conexión. Se guardó localmente en su lugar.", "error");
-                    localDB.push(nuevoRegistro);
-                    guardarDBLocal();
-                }
-            } else {
-                localDB.push(nuevoRegistro);
-                guardarDBLocal();
-                showToast("Reporte guardado en Modo Local.", "info");
-                limpiarFormularioDra();
-            }
-
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i><span>Enviar Reporte a Base de Datos</span>`;
-            lucide.createIcons();
-            
-            // Forzar actualización inmediata después de enviar
-            setTimeout(() => {
-                loadData(true);
-            }, 800);
-        }
-
-        // Cargar Datos (Leer desde Google Sheets o Local)
-        async function loadData(silent = false) {
-            // Animar e inhabilitar los botones de actualización durante la recarga
-            const btnManual = document.getElementById('btn-refresh-data-main');
-            const btnSub = document.getElementById('btn-refresh-data');
-            
-            if (btnManual) {
-                btnManual.disabled = true;
-                const icon = btnManual.querySelector('i');
-                if (icon) icon.classList.add('animate-spin');
-            }
-            if (btnSub) {
-                const iconSub = btnSub.querySelector('i');
-                if (iconSub) iconSub.classList.add('animate-spin');
-            }
-
-            if(!silent) showToast("Actualizando información en tiempo real...", "info");
-
-            if (googleSheetsURL) {
-                try {
-                    const response = await fetch(googleSheetsURL + "?cacheBust=" + Date.now());
-                    const cloudData = await response.json();
-                    
-                    if (Array.isArray(cloudData)) {
-                        // Mapear los datos de Google Sheets a nuestro formato de objetos
-async function loadData(silent = false) {
-    if(!silent) showToast("Cargando información...", "info");
-
-    if (googleSheetsURL) {
-        try {
-            const response = await fetch(googleSheetsURL + "?cacheBust=" + Date.now());
-            const cloudData = await response.json();
-
-            if (Array.isArray(cloudData)) {
-                // IDs que ya teníamos antes de esta actualización
-                const idsPrevios = new Set(localDB.map(r => r.id));
-
-                localDB = cloudData.map(row => ({
-                    id: row.ID || row.id || "",
-                    timestamp: row["Fecha Registro"] || row.timestamp || "",
-                    expediente: row.Expediente || row.expediente || "",
-                    esNuevo: row["Es Nuevo"] === "SÍ" || row["Es Nuevo"] === true || row.esNuevo === true,
-                    estadoParticipante: row["Estado Participante"] || row.estadoParticipante || "Activo",
-                    fechaVisita: row["Fecha Visita"] || row.fechaVisita || "",
-                    formularios: (row.Formularios || row.formularios || "").split(", ").filter(f => f.length > 0),
-                    notas: row.Notas || row.notas || "",
-                    estado: row.Estado || row.estado || "Pendiente",
-                    usuario: row["Usuario Registro"] || row.usuario || "Dra"
-                }));
-
-                if(!silent) showToast("Datos actualizados desde Google Sheets", "success");
-
-                // Suena SOLO si llegó un pendiente nuevo (y no en la primera carga)
-                const hayNuevos = localDB.some(r => r.estado === "Pendiente" && !idsPrevios.has(r.id));
-                if (window.__yaCargo && hayNuevos) playAlertSound();
-                window.__yaCargo = true;
-            }
-        } catch (error) {
-            console.error("Error cargando de Google Sheets, usando base local:", error);
-            if(!silent) showToast("No se pudo conectar a Google Sheets. Usando datos almacenados en navegador.", "error");
-            recuperarDBLocal();
-        }
-    } else {
-        recuperarDBLocal();
-    }
-
-    renderDashboard();
-}
-
-        // Procesar Alerta por un Asistente Específico
-        async function processByAssistant(id, assistantName) {
-            const noteInput = document.getElementById(`assistant-note-${id}`);
-            const assistantNote = noteInput ? noteInput.value.trim() : "";
-
-            const index = localDB.findIndex(item => item.id == id);
-            if(index === -1) return;
-
-            let originalNotes = localDB[index].notas || "";
-            let updatedNotes = originalNotes;
-
-            if (assistantNote) {
-                updatedNotes = originalNotes 
-                    ? `${originalNotes} | [Nota ${assistantName}]: ${assistantNote}` 
-                    : `[Nota ${assistantName}]: ${assistantNote}`;
-            }
-
-            const statusVal = `Procesado por ${assistantName}`;
-            localDB[index].estado = statusVal;
-            localDB[index].notas = updatedNotes;
-
-            if (googleSheetsURL) {
-                try {
-                    await fetch(googleSheetsURL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            action: "updateStatus", 
-                            id: id, 
-                            statusValue: statusVal, 
-                            notas: updatedNotes 
-                        })
-                    });
-                    showToast(`Registrado con éxito por ${assistantName}`, "success");
-                } catch (error) {
-                    showToast("Error de conexión. Se guardó de forma local.", "error");
-                    guardarDBLocal();
-                }
-            } else {
-                guardarDBLocal();
-                showToast(`Registrado localmente por ${assistantName}`, "success");
-            }
-
-            renderDashboard();
-        }
-
-        // Revertir Registro completado a Pendiente
-        async function revertToPending(id) {
-            const index = localDB.findIndex(item => item.id == id);
-            if(index === -1) return;
-
-            localDB[index].estado = "Pendiente";
-
-            if (googleSheetsURL) {
-                try {
-                    await fetch(googleSheetsURL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            action: "updateStatus", 
-                            id: id, 
-                            statusValue: "Pendiente" 
-                        })
-                    });
-                    showToast("Registro regresado a Alertas Clínicas Pendientes", "success");
-                } catch (error) {
-                    showToast("Error de conexión al revertir en Google Sheets", "error");
-                }
-            } else {
-                guardarDBLocal();
-                showToast("Registro regresado a Alertas Pendientes localmente", "success");
-            }
-
-            renderDashboard();
-        }
-
-        // Eliminar Próxima Visita
-        async function deleteScheduledVisit(id) {
-            const index = localDB.findIndex(item => item.id == id);
-            if (index === -1) return;
-
-            localDB[index].fechaVisita = "";
-
-            if (googleSheetsURL) {
-                try {
-                    await fetch(googleSheetsURL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            action: "updateStatus", 
-                            id: id, 
-                            fechaVisita: "" 
-                        })
-                    });
-                    showToast("Fecha de visita eliminada con éxito", "success");
-                } catch (error) {
-                    showToast("Error al eliminar la visita en Google Sheets", "error");
-                }
-            } else {
-                guardarDBLocal();
-                showToast("Visita eliminada localmente", "success");
-            }
-
-            renderDashboard();
-        }
-
-        // Habilitar edición en línea de la fecha de visita
-        function enableVisitEdit(id, currentDate) {
-            document.getElementById(`visit-view-${id}`).classList.add('hidden');
-            document.getElementById(`visit-edit-${id}`).classList.remove('hidden');
-        }
-
-        // Cancelar edición de la fecha de visita
-        function cancelVisitEdit(id) {
-            document.getElementById(`visit-view-${id}`).classList.remove('hidden');
-            document.getElementById(`visit-edit-${id}`).classList.add('hidden');
-        }
-
-        // Guardar la nueva fecha de visita
-        async function saveVisitDate(id) {
-            const newDate = document.getElementById(`input-visit-date-${id}`).value;
-            if(!newDate) {
-                showToast("Por favor, selecciona una fecha válida", "error");
-                return;
-            }
-
-            const index = localDB.findIndex(item => item.id == id);
-            if (index === -1) return;
-
-            localDB[index].fechaVisita = newDate;
-
-            if (googleSheetsURL) {
-                try {
-                    await fetch(googleSheetsURL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            action: "updateStatus", 
-                            id: id, 
-                            fechaVisita: newDate 
-                        })
-                    });
-                    showToast("Fecha de visita actualizada en la nube", "success");
-                } catch (error) {
-                    showToast("Error de conexión al guardar en Google Sheets", "error");
-                }
-            } else {
-                guardarDBLocal();
-                showToast("Fecha de visita actualizada localmente", "success");
-            }
-
-            renderDashboard();
-        }
-
-        // Renderizado del Dashboard de Asistentes
-        function renderDashboard() {
-            if(!currentUser || currentUser.role !== 'asistente') return;
-
-            const searchQuery = document.getElementById('dashboard-search').value.toLowerCase().trim();
-            const pendingContainer = document.getElementById('pending-container');
-            const visitsTableBody = document.getElementById('visits-table-body');
-            const historyTableBody = document.getElementById('history-table-body');
-
-            // Limpiar vistas
-            pendingContainer.innerHTML = "";
-            visitsTableBody.innerHTML = "";
-            historyTableBody.innerHTML = "";
-
-            let pendingCount = 0;
-            let newParticipantsCount = 0;
-            let scheduledVisitsCount = 0;
-
-            // Filtrar y ordenar la base de datos
-            const filteredDB = localDB.filter(item => {
-                if(!item.expediente) return false;
-                return item.expediente.toLowerCase().includes(searchQuery) || 
-                       item.formularios.join(" ").toLowerCase().includes(searchQuery);
-            });
-
-            // Procesar cada elemento de la BD
-            filteredDB.forEach(item => {
-                const isPending = item.estado.startsWith("Pendiente");
-
-                // Contar métricas globales
-                if(isPending) {
-                    pendingCount++;
-                    if(item.esNuevo) newParticipantsCount++;
-                }
-                if(item.fechaVisita) scheduledVisitsCount++;
-
-                // Generar Badges visuales de Hitoclinico
-                let hitoBadgeHTML = "";
-                if (item.estadoParticipante === "Finalizó") {
-                    hitoBadgeHTML = `
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-purple-100 text-purple-800 rounded-full text-[9px] font-black uppercase tracking-wider">
-                            🎓 FINALIZÓ
-                        </span>
-                    `;
-                } else if (item.estadoParticipante === "Se retiró") {
-                    hitoBadgeHTML = `
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-rose-100 text-rose-800 rounded-full text-[9px] font-black uppercase tracking-wider animate-pulse">
-                            ⚠️ SE RETIRÓ
-                        </span>
-                    `;
-                }
-
-                // RENDERIZAR TABLA DE PRÓXIMAS VISITAS CON EDITAR Y BORRAR EN LÍNEA
-                if (item.fechaVisita) {
-                    const dateObj = new Date(item.fechaVisita + "T00:00:00");
-                    const formattedDate = dateObj.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
-                    
-                    const row = document.createElement('tr');
-                    row.className = "border-b border-slate-100 hover:bg-slate-50";
-                    row.innerHTML = `
-                        <td class="py-3 px-4 font-bold text-slate-700">${item.expediente}</td>
-                        <td class="py-3 px-4">
-                            <!-- Modo Visualización -->
-                            <div id="visit-view-${item.id}" class="flex items-center gap-2">
-                                <span class="text-amber-800 font-semibold flex items-center gap-1">
-                                    <i data-lucide="clock" class="w-3.5 h-3.5"></i>
-                                    ${formattedDate}
-                                </span>
-                                <button onclick="enableVisitEdit('${item.id}', '${item.fechaVisita}')" class="p-1 hover:bg-slate-100 text-slate-400 hover:text-indigo-600 rounded transition-all" title="Editar Fecha">
-                                    <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
-                                </button>
-                                <button onclick="deleteScheduledVisit('${item.id}')" class="p-1 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded transition-all" title="Eliminar Fecha de Visita">
-                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                                </button>
-                            </div>
-                            <!-- Modo Edición en Línea -->
-                            <div id="visit-edit-${item.id}" class="hidden flex items-center gap-2">
-                                <input type="date" id="input-visit-date-${item.id}" value="${item.fechaVisita}" class="px-2 py-1 border border-slate-300 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none">
-                                <button onclick="saveVisitDate('${item.id}')" class="p-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-all" title="Guardar">
-                                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
-                                </button>
-                                <button onclick="cancelVisitEdit('${item.id}')" class="p-1 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-lg transition-all" title="Cancelar">
-                                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                                </button>
-                            </div>
-                        </td>
-                        <td class="py-3 px-4">
-                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 uppercase">Programada</span>
-                        </td>
-                    `;
-                    visitsTableBody.appendChild(row);
-                }
-
-                // RENDERIZAR PENDIENTES CON CONTROL DE NOTAS Y ACCIONES INDIVIDUALES
-                if(isPending) {
-                    const alertCard = document.createElement('div');
-                    alertCard.className = `bg-white rounded-2xl border ${item.esNuevo ? 'border-emerald-200 bg-emerald-50/20' : 'border-slate-100'} ${item.estadoParticipante !== 'Activo' ? 'border-purple-200 bg-purple-50/10' : ''} p-5 shadow-sm space-y-4 hover:shadow-md transition-all duration-300 relative overflow-hidden`;
-                    
-                    // Franja visual de alerta
-                    const alertRibbon = document.createElement('div');
-                    let ribbonColor = 'bg-indigo-500';
-                    if (item.esNuevo) ribbonColor = 'bg-emerald-500';
-                    if (item.estadoParticipante === 'Finalizó') ribbonColor = 'bg-purple-500';
-                    if (item.estadoParticipante === 'Se retiró') ribbonColor = 'bg-rose-500';
-                    
-                    alertRibbon.className = `absolute top-0 left-0 w-1.5 h-full ${ribbonColor}`;
-                    alertCard.appendChild(alertRibbon);
-
-                    // Generar píldoras de color para los formularios según la imagen cargada
-                    const formsHTML = item.formularios.map(form => {
-                        let colorClass = "bg-slate-100 text-slate-700";
-                        if (form.includes("Cuestionario #1")) colorClass = "bg-emerald-500 text-white";
-                        else if (form.includes("Antropometría") && form.includes("1v")) colorClass = "bg-purple-500 text-white";
-                        else if (form.includes("Antropometría") && form.includes("2v")) colorClass = "bg-sky-400 text-slate-900";
-                        else if (form.includes("Antropometría") && form.includes("3v")) colorClass = "bg-amber-600 text-white";
-                        else if (form.includes("Agua corporal") && form.includes("3v")) colorClass = "bg-cyan-700 text-white";
-                        else if (form.includes("Cuestionario #2")) colorClass = "bg-yellow-400 text-slate-900";
-                        else if (form.includes("vida") && form.includes("Antropometría")) colorClass = "bg-lime-400 text-slate-900";
-                        else if (form.includes("post") && form.includes("Antropometría")) colorClass = "bg-fuchsia-400 text-white";
-                        else if (form.includes("Agua corporal") && form.includes("post")) colorClass = "bg-sky-300 text-slate-900";
-                        else if (form.includes("Agua corporal") && form.includes("vida")) colorClass = "bg-rose-400 text-white";
-                        else if (form.includes("Cambio de Estado")) colorClass = "bg-indigo-900 text-white font-extrabold";
-
-                        return `<span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${colorClass}">${form}</span>`;
-                    }).join(" ");
-
-                    alertCard.innerHTML += `
-                        <div class="flex items-start justify-between gap-2">
-                            <div>
-                                <div class="flex items-center flex-wrap gap-1.5">
-                                    <h4 class="text-base font-extrabold text-slate-800 leading-tight">${item.expediente}</h4>
-                                    ${item.esNuevo ? `
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-100 text-emerald-800 rounded-full text-[9px] font-black uppercase tracking-wider animate-pulse">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                            ¡NUEVO!
-                                        </span>
-                                    ` : ''}
-                                    ${hitoBadgeHTML}
-                                </div>
-                                <p class="text-[10px] text-slate-400 mt-0.5">Ingresado por la Dra: ${item.timestamp}</p>
-                            </div>
-                        </div>
-
-                        <div class="flex flex-wrap gap-1.5">
-                            ${formsHTML}
-                        </div>
-
-                        ${item.notas ? `
-                            <div class="bg-slate-50/80 p-3 rounded-xl border border-slate-100 text-xs text-slate-600">
-                                <strong>Comentarios Originales:</strong> ${item.notas}
-                            </div>
-                        ` : ''}
-
-                        <!-- Entrada de Nota del Asistente -->
-                        <div class="space-y-1.5">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Agregar Nota / Comentario de Coordinación</label>
-                            <input type="text" id="assistant-note-${item.id}" placeholder="Escribe un mensaje para los otros asistentes..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none">
-                        </div>
-
-                        ${item.fechaVisita ? `
-                            <div class="flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50/50 px-2.5 py-1 rounded-lg w-max border border-amber-100">
-                                <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
-                                <span>Próxima Visita: ${item.fechaVisita}</span>
-                            </div>
-                        ` : ''}
-
-                        <!-- OPCIONES DE COMPLETADO INDIVIDUALES -->
-                        <div class="pt-3 border-t border-slate-100 mt-4">
-                            <span class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Completar y Guardar como:</span>
-                            <div class="grid grid-cols-3 gap-2">
-                                <button onclick="processByAssistant('${item.id}', 'Alejandro')" class="py-2 bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-bold rounded-xl transition-all border border-sky-100 shadow-sm">
-                                    Alejandro
-                                </button>
-                                <button onclick="processByAssistant('${item.id}', 'Leonardo')" class="py-2 bg-violet-50 hover:bg-violet-100 text-violet-700 text-xs font-bold rounded-xl transition-all border border-violet-100 shadow-sm">
-                                    Leonardo
-                                </button>
-                                <button onclick="processByAssistant('${item.id}', 'Dayana')" class="py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-xl transition-all border border-rose-100 shadow-sm">
-                                    Dayana
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    pendingContainer.appendChild(alertCard);
-                } else {
-                    // RENDERIZAR TABLA DE HISTORIAL CON ACCIÓN DE BORRAR/REVERTIR INDIVIDUAL
-                    const formsHTML = item.formularios.map(form => {
-                        return `<span class="inline-block px-1.5 py-0.5 bg-slate-100 rounded text-[10px] font-medium text-slate-600 m-0.5">${form}</span>`;
-                    }).join("");
-
-                    // Extraer asistente que lo procesó
-                    const procesadoPor = item.estado.replace("Procesado por ", "");
-
-                    const row = document.createElement('tr');
-                    row.className = "border-b border-slate-100 hover:bg-slate-50";
-                    row.innerHTML = `
-                        <td class="py-3.5 px-4 text-slate-500 font-medium whitespace-nowrap">${item.timestamp}</td>
-                        <td class="py-3.5 px-4 font-bold text-slate-700">
-                            <div>${item.expediente}</div>
-                            ${hitoBadgeHTML ? `<div class="mt-1">${hitoBadgeHTML}</div>` : ''}
-                        </td>
-                        <td class="py-3.5 px-4 font-bold">${item.esNuevo ? '<span class="text-emerald-600">Nuevo</span>' : '<span class="text-slate-400">Existente</span>'}</td>
-                        <td class="py-3.5 px-4">${formsHTML}</td>
-                        <td class="py-3.5 px-4 text-slate-600 max-w-xs break-words" title="${item.notas}">${item.notas || 'Sin comentarios'}</td>
-                        <td class="py-3.5 px-4">
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-indigo-50 text-indigo-700 uppercase">
-                                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                                ${procesadoPor}
-                            </span>
-                        </td>
-                        <td class="py-3.5 px-4 text-right">
-                            <button onclick="revertToPending('${item.id}')" class="inline-flex items-center gap-1 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-xl border border-rose-100 transition-all" title="Eliminar del historial y volver a procesar">
-                                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
-                                <span>Revertir</span>
-                            </button>
-                        </td>
-                    `;
-                    historyTableBody.appendChild(row);
-                }
-            });
-
-            // Actualizar Tarjetas de Estadísticas
-            document.getElementById('stat-pending').innerText = pendingCount;
-            document.getElementById('stat-new').innerText = newParticipantsCount;
-            document.getElementById('stat-visits').innerText = scheduledVisitsCount;
-
-            // Re-renderizar iconos dinámicos de Lucide
-            lucide.createIcons();
-        }
-
-        // ================= CONFIGURACIÓN GOOGLE SHEETS =================
-
-        function toggleSheetsPanel() {
-            const panel = document.getElementById('panel-sheets-config');
-            panel.classList.toggle('hidden');
-        }
-
-        // Guardar ambos enlaces en LocalStorage
-        function saveSheetsURL() {
-            const urlInput = document.getElementById('sheets-url-input').value.trim();
-            const spreadsheetInput = document.getElementById('spreadsheet-url-input').value.trim();
-
-            // Validar macro script
-            if(urlInput === "") {
-                localStorage.removeItem('medsync_sheets_url');
-                googleSheetsURL = DEFAULT_MACRO_URL;
-            } else if(urlInput.startsWith("https://script.google.com/")) {
-                localStorage.setItem('medsync_sheets_url', urlInput);
-                googleSheetsURL = urlInput;
-            } else {
-                showToast("Por favor, ingresa una URL válida de Google Apps Script", "error");
-                return;
-            }
-
-            // Validar enlace hoja de calculo
-            if(spreadsheetInput === "") {
-                localStorage.removeItem('medsync_spreadsheet_real_url');
-                spreadsheetRealURL = DEFAULT_SPREADSHEET_URL;
-            } else if(spreadsheetInput.includes("docs.google.com/spreadsheets")) {
-                localStorage.setItem('medsync_spreadsheet_real_url', spreadsheetInput);
-                spreadsheetRealURL = spreadsheetInput;
-            } else {
-                showToast("Por favor, ingresa una URL válida de Google Sheets (docs.google.com/spreadsheets...)", "error");
-                return;
-            }
-
-            updateSheetsStatusBadge(!!googleSheetsURL);
-            updateSpreadsheetButton(); // Actualizar cabecera
-            showToast("Configuración de Google Sheets guardada con éxito", "success");
-            loadData();
-        }
-
-        async function runConnectionTest() {
-            const urlInput = document.getElementById('sheets-url-input').value.trim();
-            if(!urlInput) {
-                showToast("Debe guardar un enlace de Apps Script antes de correr la prueba", "error");
-                return;
-            }
-
-            showToast("Ejecutando prueba de conexión...", "info");
-            const testRecord = {
-                action: "add",
-                id: "PRUEBA-" + Date.now(),
-                timestamp: obtenerFechaHoraActual(),
-                expediente: "PRUEBA-DEV",
-                esNuevo: true,
-                estadoParticipante: "Activo",
-                fechaVisita: "",
-                formularios: ["Cuestionario #1 (1visita)"],
-                notas: "Este es un expediente de prueba generado automáticamente para validar la conexión con Google Sheets.",
-                estado: "Pendiente",
-                usuario: "Consola de Desarrollo"
-            };
-
-            try {
-                await fetch(urlInput, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(testRecord)
-                });
-                showToast("¡CONEXIÓN EXITOSA! Revisa tu Google Sheet, deberías ver una fila nueva con 'PRUEBA-DEV'", "success");
-            } catch (error) {
-                showToast("Error al conectarse a Google Sheets. Revisa tu código en Apps Script.", "error");
-            }
-        }
-
-        function updateSheetsStatusBadge(connected) {
-            const badge = document.getElementById('txt-status-sheets');
-            const syncText = document.getElementById('status-sync-text');
-            const syncIndicator = document.getElementById('status-sync-indicator');
-
-            if(connected) {
-                badge.innerText = "Google Sheets Connected";
-                syncText.innerText = "Sincronizado en tiempo real con Google Sheets en tu nube.";
-                syncIndicator.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> <span>Sincronizado en tiempo real con Google Sheets en tu nube.</span>`;
-            } else {
-                badge.innerText = "Modo Local (Simulación)";
-                syncText.innerText = "Modo local activo. Pega tu enlace de Google Apps Script para sincronizar en línea.";
-                syncIndicator.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-yellow-400 animate-pulse"></span> <span>Modo local activo (Simulación). Guarda datos solo en la memoria de este navegador.</span>`;
-            }
-        }
-
-        // ================= UTILIDADES GENERALES =================
-
-        function showToast(message, type = "info") {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            
-            let colorClass = "bg-slate-900 text-white";
-            let icon = "info";
-
-            if (type === "success") {
-                colorClass = "bg-emerald-600 text-white shadow-emerald-100";
-                icon = "check-circle";
-            } else if (type === "error") {
-                colorClass = "bg-rose-600 text-white shadow-rose-100";
-                icon = "alert-triangle";
-            } else if (type === "info") {
-                colorClass = "bg-indigo-600 text-white shadow-indigo-100";
-                icon = "info";
-            }
-
-            toast.className = `p-4 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-2.5 pointer-events-auto transition-all duration-300 transform translate-y-2 opacity-0 ${colorClass}`;
-            toast.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4"></i> <span>${message}</span>`;
-            
-            container.appendChild(toast);
-            lucide.createIcons();
-
-            // Animación de entrada
-            setTimeout(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            }, 10);
-
-            // Desvanecer y remover
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-1');
-                setTimeout(() => {
-                    toast.remove();
-                }, 300);
-            }, 4500);
-        }
-
-        function obtenerFechaHoraActual() {
-            const hoy = new Date();
-            const dia = String(hoy.getDate()).padStart(2, '0');
-            const mes = String(hoy.getMonth() + 1).padStart(2, '0');
-            const ampm = hoy.getHours() >= 12 ? 'PM' : 'AM';
-            const anio = hoy.getFullYear();
-            const hora = String(hoy.getHours()).padStart(2, '0');
-            const min = String(hoy.getMinutes()).padStart(2, '0');
-            const sec = String(hoy.getSeconds()).padStart(2, '0');
-            return `${dia}/${mes}/${anio} ${hora}:${min}:${sec}`;
-        }
-
-        function limpiarFormularioDra() {
-            document.getElementById('expediente-id').value = "";
-            document.getElementById('is-new-participant').checked = false;
-            document.getElementById('next-visit-date').value = "";
-            document.getElementById('dra-comments').value = "";
-            
-            const checkboxes = document.getElementsByName('form-item');
-            checkboxes.forEach(cb => cb.checked = false);
-
-            // Restaurar estado a Activo
-            document.querySelector('input[name="participant-status"][value="Activo"]').checked = true;
-            updateStatusSegmentStyles();
-        }
-
-        // Persistencia Local (LocalStorage fallback)
-        function guardarDBLocal() {
-            localStorage.setItem('medsync_local_db', JSON.stringify(localDB));
-        }
-
-        // Recuperar base local o configuraciones iniciales
-        function recuperarDBLocal() {
-            const guardado = localStorage.getItem('medsync_local_db');
-            if(guardado) {
-                localDB = JSON.parse(guardado);
-            }
-        }
-    </script>
+      </div>
+      <div id="forms"></div>
+      <div class="card">
+        <label class="f">Próxima visita (opcional)</label>
+        <input type="date" id="fecha" style="margin-bottom:12px">
+        <label class="f">Notas (opcional)</label>
+        <textarea id="notas" rows="2"></textarea>
+      </div>
+      <button class="btn" id="send">Enviar reporte</button>
+    </form>
+  </section>
+
+  <!-- VISTA ASISTENTES -->
+  <section id="vAsis" hidden>
+    <input type="search" id="q" placeholder="🔍 Buscar expediente o formulario" style="margin-bottom:12px">
+    <div id="list"></div>
+  </section>
+</div>
+<nav id="nav" hidden>
+  <button data-tab="alertas"><b>🔔</b>Alertas <span id="cnt"></span></button>
+  <button data-tab="visitas"><b>📅</b>Visitas</button>
+  <button data-tab="historial"><b>✅</b>Historial</button>
+</nav>
+</div>
+
+<script>
+// ====== ENLACES (cámbialos aquí si algún día se crea otra implementación) ======
+const API="https://script.google.com/macros/s/AKfycbzvdiMotbDGdDKUovmDbmkRU26dY-P4_1qtvWKbK4anQMV-cQD9XSDz98z_L_MLauOPFw/exec";
+const SHEET="https://docs.google.com/spreadsheets/d/1JWhtxnTkh0ZnyTk2fhlvGbwifNYXdAkc-akwJb-WdKA/edit?usp=sharing";
+const ASIST=["Alejandro","Leonardo","Dayana"];
+const G=[["1ª visita",["Cuestionario #1 (1visita)","Antropometría y bioimpedancia (1visita)"]],
+["2ª visita",["Antropometría y bioimpedancia (2visita)"]],
+["3ª visita",["Antropometría y bioimpedancia (3visita)","Agua corporal (3visita)"]],
+["4ª visita (3 meses)",["Cuestionario #2 (4visita)","Antropometría 4visita (3 meses vida)","Antropometría 4visita (3 meses post)","Agua corporal 4visita (3 meses post)","Agua corporal 4visita (3 meses vida)"]]];
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let role=localStorage.getItem("ms_role"),DB=[],tab="alertas",loaded=false,sig="",timer=null;
+
+function toast(m,t){const d=document.createElement("div");if(t==="err")d.className="err";d.textContent=m;$("#toast").appendChild(d);setTimeout(()=>d.remove(),4000)}
+
+// ---- Tema: por defecto el del dispositivo; si se cambia, se recuerda ----
+function theme(){const s=localStorage.getItem("ms_theme");const d=s?s==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+document.documentElement.dataset.t=d?"dark":"light";$("meta[name=theme-color]").content=d?"#130f15":"#92228C";$("#bTheme").textContent=d?"☀️":"🌙"}
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",theme);
+$("#bTheme").onclick=()=>{localStorage.setItem("ms_theme",document.documentElement.dataset.t==="dark"?"light":"dark");theme()};
+theme();
+
+// ---- Instalación como app ----
+let dp;addEventListener("beforeinstallprompt",e=>{e.preventDefault();dp=e;$("#bInst").hidden=false});
+$("#bInst").onclick=async()=>{if(!dp)return;dp.prompt();await dp.userChoice;dp=null;$("#bInst").hidden=true};
+if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!(matchMedia("(display-mode: standalone)").matches||navigator.standalone)&&!localStorage.getItem("ms_ios"))$("#iosTip").hidden=false;
+$("#iosX").onclick=()=>{$("#iosTip").hidden=true;localStorage.setItem("ms_ios","1")};
+if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+
+// ---- Avisos (sonido + notificación del sistema) ----
+function bell(){$("#bBell").textContent=("Notification"in window&&Notification.permission==="granted")?"🔔":"🔕"}
+$("#bBell").onclick=async()=>{if(!("Notification"in window))return toast("Este dispositivo no admite avisos","err");
+const p=await Notification.requestPermission();bell();toast(p==="granted"?"Avisos activados":"Avisos bloqueados en este dispositivo",p==="granted"?"":"err")};
+function beep(){try{const c=new(window.AudioContext||window.webkitAudioContext)(),t=c.currentTime;
+[660,880].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.frequency.value=f;o.connect(g);g.connect(c.destination);
+g.gain.setValueAtTime(.2,t+i*.18);g.gain.exponentialRampToValueAtTime(.001,t+i*.18+.16);o.start(t+i*.18);o.stop(t+i*.18+.17)})}catch(e){}}
+function notify(n){beep();if("Notification"in window&&Notification.permission==="granted"){const m=n+(n>1?" expedientes nuevos":" expediente nuevo"),o={body:m,icon:"icons/icon-192.png"};
+navigator.serviceWorker?.ready.then(r=>r.showNotification("MedSync",o)).catch(()=>{try{new Notification("MedSync",o)}catch(e){}})}}
+
+// ---- Sesión ----
+$("#fLogin").onsubmit=e=>{e.preventDefault();const u=$("#u").value.trim().toLowerCase(),p=$("#p").value.trim();
+if(p==="bdalerta"&&(u==="lilliam"||u==="asistente")){role=u==="lilliam"?"dra":"asis";localStorage.setItem("ms_role",role);start()}else toast("Usuario o contraseña incorrectos","err")};
+$("#bOut").onclick=()=>{localStorage.removeItem("ms_role");location.reload()};
+$("#bSwitch").onclick=()=>{role=role==="dra"?"asis":"dra";localStorage.setItem("ms_role",role);view()};
+function start(){$("#login").hidden=true;$("#app").hidden=false;bell();view();load();if(!timer)timer=setInterval(load,30000)}
+function view(){$("#vDra").hidden=role!=="dra";$("#vAsis").hidden=role!=="asis";$("#nav").hidden=role!=="asis";
+$("#who").textContent=role==="dra"?"Dra. Lilliam":"Equipo asistente";sig="";render()}
+
+// ---- Datos ----
+async function post(o){try{await fetch(API,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(o)});return true}catch(e){return false}}
+async function load(){let ok=true;
+try{const r=await fetch(API+"?t="+Date.now()),d=await r.json();if(!Array.isArray(d))throw 0;
+const prev=new Set(DB.map(x=>x.id));
+DB=d.map(w=>({id:w.ID,timestamp:w["Fecha Registro"],expediente:w.Expediente,esNuevo:w["Es Nuevo"]==="SÍ",estadoParticipante:w["Estado Participante"]||"Activo",fechaVisita:w["Fecha Visita"]||"",formularios:(w.Formularios||"").split(", ").filter(Boolean),notas:w.Notas||"",estado:w.Estado||"Pendiente"}));
+const n=DB.filter(r=>r.estado==="Pendiente"&&!prev.has(r.id)).length;
+if(loaded&&n&&role==="asis")notify(n);loaded=true}catch(e){ok=false}
+$("#dot").className="dot"+(ok?"":" off");render()}
+
+// ---- Vista Lilliam ----
+$("#forms").innerHTML=G.map((g,i)=>`<div class="card"><div class="row"><b>${g[0]}</b><span class="sp"></span><button type="button" class="ghost" data-all="${i}">Seleccionar todo</button></div>${g[1].map(f=>`<label class="opt"><input type="checkbox" name="fm" data-g="${i}" value="${f}"><span>${f}</span></label>`).join("")}</div>`).join("");
+$("#forms").onclick=e=>{const i=e.target.dataset.all;if(i==null)return;const c=[...document.querySelectorAll(`[data-g="${i}"]`)],on=c.some(x=>!x.checked);c.forEach(x=>x.checked=on)};
+document.querySelectorAll("[name=est]").forEach(r=>r.onchange=()=>{$("#forms").hidden=document.querySelector("[name=est]:checked").value!=="Activo"});
+$("#fDra").onsubmit=async e=>{e.preventDefault();const est=document.querySelector("[name=est]:checked").value,act=est==="Activo";
+const fm=act?[...document.querySelectorAll("[name=fm]:checked")].map(x=>x.value):["[Cambio de Estado: "+est+"]"];
+if(!fm.length)return toast("Selecciona al menos un formulario","err");
+const d=new Date(),z=n=>String(n).padStart(2,"0");
+const rec={action:"add",id:"REG-"+Date.now(),timestamp:`${z(d.getDate())}/${z(d.getMonth()+1)}/${d.getFullYear()} ${z(d.getHours())}:${z(d.getMinutes())}:${z(d.getSeconds())}`,
+expediente:$("#exp").value.trim().toUpperCase(),esNuevo:$("#nuevo").checked,estadoParticipante:est,fechaVisita:act?$("#fecha").value:"",formularios:fm,notas:$("#notas").value.trim(),estado:"Pendiente",usuario:"Dra"};
+const b=$("#send");b.disabled=true;b.textContent="Enviando…";
+await post(rec);await load();
+const ok=DB.some(r=>r.id===rec.id);
+toast(ok?"✓ Reporte enviado y confirmado en la hoja":"No se pudo confirmar el envío. Revisa la conexión e inténtalo de nuevo",ok?"":"err");
+if(ok){$("#fDra").reset();$("#forms").hidden=false}b.disabled=false;b.textContent="Enviar reporte"};
+
+// ---- Vista asistentes ----
+function render(){if(role!=="asis")return;
+const pend=DB.filter(r=>r.estado==="Pendiente").length;$("#cnt").textContent=pend?`(${pend})`:"";document.title=(pend?`(${pend}) `:"")+"MedSync Tracker";
+const q=$("#q").value.toLowerCase().trim(),s=JSON.stringify(DB)+tab+q;if(s===sig)return;sig=s;
+document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
+let it=DB.slice().reverse().filter(r=>!q||(r.expediente+" "+r.formularios.join(" ")).toLowerCase().includes(q));
+it=tab==="alertas"?it.filter(r=>r.estado==="Pendiente"):tab==="visitas"?it.filter(r=>r.fechaVisita).sort((a,b)=>a.fechaVisita.localeCompare(b.fechaVisita)):it.filter(r=>r.estado!=="Pendiente");
+$("#list").innerHTML=it.length?it.map(r=>`<div class="card ${r.esNuevo&&r.estado==="Pendiente"?"nw":""}">
+<div class="row"><b class="exp">${esc(r.expediente)}</b>${r.esNuevo?'<span class="tag lime">NUEVA</span>':""}<span class="tag">${esc(r.estadoParticipante)}</span></div>
+<div class="chips">${r.formularios.map(f=>`<span class="chip">${esc(f)}</span>`).join("")}</div>
+${r.fechaVisita?`<p class="mu">📅 Próxima visita: ${esc(r.fechaVisita)}</p>`:""}${r.notas?`<p class="mu">📝 ${esc(r.notas)}</p>`:""}
+<p class="mu s">${esc(r.timestamp)} · ${esc(r.estado)}</p>
+${r.estado==="Pendiente"?`<input type="text" id="n-${esc(r.id)}" placeholder="Nota (opcional)" style="margin-top:10px"><div class="acts">${ASIST.map(n=>`<button data-a="p" data-id="${esc(r.id)}" data-n="${n}">${n}</button>`).join("")}</div>`
+:`<div style="margin-top:10px"><button class="ghost" data-a="r" data-id="${esc(r.id)}">Regresar a pendiente</button></div>`}</div>`).join("")
+:`<div class="empty">${tab==="alertas"?"🎉 No hay alertas pendientes":"Nada por aquí"}</div>`}
+$("#q").oninput=render;
+$("#nav").onclick=e=>{const t=e.target.closest("button")?.dataset.tab;if(t){tab=t;render()}};
+$("#list").onclick=async e=>{const b=e.target.closest("[data-a]");if(!b)return;const r=DB.find(x=>x.id===b.dataset.id);if(!r)return;
+if(b.dataset.a==="p"){const n=b.dataset.n,t=(document.getElementById("n-"+r.id)?.value||"").trim();
+r.notas=t?(r.notas?r.notas+" | ":"")+`[Nota ${n}]: ${t}`:r.notas;r.estado="Procesado por "+n;sig="";render();
+toast(await post({action:"updateStatus",id:r.id,statusValue:r.estado,notas:r.notas})?"Registrado por "+n:"Error de conexión","");}
+else{r.estado="Pendiente";sig="";render();await post({action:"updateStatus",id:r.id,statusValue:"Pendiente"});toast("Regresado a pendientes","")}};
+
+if(role)start();
+</script>
 </body>
 </html>
