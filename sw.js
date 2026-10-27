@@ -1,5 +1,5 @@
 // Service Worker básico para permitir la instalación PWA de MedSync Tracker
-const CACHE_NAME = 'medsync-v1';
+const CACHE_NAME = 'medsync-v2';
 const ASSETS = [
   'index.html',
   'manifest.json'
