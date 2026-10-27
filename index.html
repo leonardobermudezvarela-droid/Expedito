@@ -1002,49 +1002,49 @@ let spreadsheetRealURL = DEFAULT_SPREADSHEET_URL;
                     
                     if (Array.isArray(cloudData)) {
                         // Mapear los datos de Google Sheets a nuestro formato de objetos
-                        localDB = cloudData.map(row => ({
-                            id: row.ID || row.id || "",
-                            timestamp: row["Fecha Registro"] || row.timestamp || "",
-                            expediente: row.Expediente || row.expediente || "",
-                            esNuevo: row["Es Nuevo"] === "SÍ" || row["Es Nuevo"] === true || row.esNuevo === true,
-                            estadoParticipante: row["Estado Participante"] || row.estadoParticipante || "Activo",
-                            fechaVisita: row["Fecha Visita"] || row.fechaVisita || "",
-                            formularios: (row.Formularios || row.formularios || "").split(", ").filter(f => f.length > 0),
-                            notas: row.Notas || row.notas || "",
-                            estado: row.Estado || row.estado || "Pendiente",
-                            usuario: row["Usuario Registro"] || row.usuario || "Dra"
-                        }));
-                        if(!silent) showToast("Datos actualizados desde Google Sheets", "success");
-                        playAlertSound();
-                    }
-                } catch (error) {
-                    console.error("Error cargando de Google Sheets, usando base local:", error);
-                    if(!silent) showToast("No se pudo conectar a Google Sheets. Usando datos locales.", "error");
-                    recuperarDBLocal();
-                }
-            } else {
-                recuperarDBLocal();
-            }
+async function loadData(silent = false) {
+    if(!silent) showToast("Cargando información...", "info");
 
-            // Registrar última sincronización exitosa en pantalla
-            const now = new Date();
-            const timeStr = now.toTimeString().split(' ')[0];
-            const badge = document.getElementById('last-sync-badge');
-            if (badge) badge.innerText = `Última recarga: ${timeStr}`;
+    if (googleSheetsURL) {
+        try {
+            const response = await fetch(googleSheetsURL + "?cacheBust=" + Date.now());
+            const cloudData = await response.json();
 
-            renderDashboard();
+            if (Array.isArray(cloudData)) {
+                // IDs que ya teníamos antes de esta actualización
+                const idsPrevios = new Set(localDB.map(r => r.id));
 
-            // Detener animación de recarga
-            if (btnManual) {
-                btnManual.disabled = false;
-                const icon = btnManual.querySelector('i');
-                if (icon) icon.classList.remove('animate-spin');
+                localDB = cloudData.map(row => ({
+                    id: row.ID || row.id || "",
+                    timestamp: row["Fecha Registro"] || row.timestamp || "",
+                    expediente: row.Expediente || row.expediente || "",
+                    esNuevo: row["Es Nuevo"] === "SÍ" || row["Es Nuevo"] === true || row.esNuevo === true,
+                    estadoParticipante: row["Estado Participante"] || row.estadoParticipante || "Activo",
+                    fechaVisita: row["Fecha Visita"] || row.fechaVisita || "",
+                    formularios: (row.Formularios || row.formularios || "").split(", ").filter(f => f.length > 0),
+                    notas: row.Notas || row.notas || "",
+                    estado: row.Estado || row.estado || "Pendiente",
+                    usuario: row["Usuario Registro"] || row.usuario || "Dra"
+                }));
+
+                if(!silent) showToast("Datos actualizados desde Google Sheets", "success");
+
+                // Suena SOLO si llegó un pendiente nuevo (y no en la primera carga)
+                const hayNuevos = localDB.some(r => r.estado === "Pendiente" && !idsPrevios.has(r.id));
+                if (window.__yaCargo && hayNuevos) playAlertSound();
+                window.__yaCargo = true;
             }
-            if (btnSub) {
-                const iconSub = btnSub.querySelector('i');
-                if (iconSub) iconSub.classList.remove('animate-spin');
-            }
+        } catch (error) {
+            console.error("Error cargando de Google Sheets, usando base local:", error);
+            if(!silent) showToast("No se pudo conectar a Google Sheets. Usando datos almacenados en navegador.", "error");
+            recuperarDBLocal();
         }
+    } else {
+        recuperarDBLocal();
+    }
+
+    renderDashboard();
+}
 
         // Procesar Alerta por un Asistente Específico
         async function processByAssistant(id, assistantName) {
