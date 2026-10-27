@@ -9,17 +9,17 @@
 <link rel="icon" href="icons/favicon-32.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <style>
-:root{--bg:#f7f3f8;--card:#fff;--tx:#2a1d2e;--mu:#7a6b80;--bd:#eadff0;--pr:#92228C;--fu:#A93E7E;--li:#B8C14C;--co:#E67F52;--soft:#f4e8f3}
-:root[data-t=dark]{--bg:#130f15;--card:#1d1820;--tx:#f3ecf5;--mu:#a597ab;--bd:#2e2634;--soft:#2a1d2c;--pr:#b23fab}
+:root{--bg:#f7f3f8;--card:#ffffffb8;--glass:#ffffffa6;--tx:#2a1d2e;--mu:#7a6b80;--bd:#eadff0;--pr:#92228C;--fu:#A93E7E;--li:#B8C14C;--co:#E67F52;--soft:#f4e8f3}
+:root[data-t=dark]{--bg:#130f15;--card:#1d1820a8;--glass:#130f15b3;--tx:#f3ecf5;--mu:#a597ab;--bd:#2e2634;--soft:#2a1d2c;--pr:#b23fab}
 *{box-sizing:border-box}[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
 button,input,textarea{font:inherit;color:inherit}
 .wrap{max-width:640px;margin:0 auto;padding:0 16px calc(110px + env(safe-area-inset-bottom))}
-header{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(12px + env(safe-area-inset-top)) 0 10px;display:flex;align-items:center;gap:10px}
+header{position:sticky;top:0;z-index:5;background:var(--glass);margin:0 -16px;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--bd)}
 header img{width:38px;height:38px;border-radius:11px}
 header h1{font-size:17px;margin:0;line-height:1.1}header small{color:var(--mu);font-size:12px}
 header .sp{flex:1}
-.ib{width:40px;height:40px;border-radius:50%;border:1px solid var(--bd);background:var(--card);font-size:17px;cursor:pointer}
+.ib{width:42px;height:42px;border-radius:50%;border:1px solid var(--bd);background:var(--glass);color:var(--tx);display:grid;place-items:center;cursor:pointer;padding:0}
 .dot{width:9px;height:9px;border-radius:50%;background:var(--li);display:inline-block;margin-right:5px}.dot.off{background:var(--co)}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:16px;margin:0 0 12px}
 .card.nw{border-color:var(--li);box-shadow:0 0 0 1px var(--li) inset}
@@ -43,11 +43,11 @@ input:focus,textarea:focus{border-color:var(--pr)}
 .acts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
 .acts button{padding:10px 4px;border-radius:12px;border:0;background:var(--pr);color:#fff;font-weight:700;font-size:13px;cursor:pointer}
 .empty{text-align:center;color:var(--mu);padding:40px 10px}
-nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom));width:min(92%,420px);background:var(--card);border:1px solid var(--bd);border-radius:99px;display:flex;padding:6px;box-shadow:0 8px 30px #0004;z-index:6}
+nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom));width:min(92%,420px);background:var(--card);border:1px solid var(--bd);border-radius:99px;display:flex;padding:6px;box-shadow:0 8px 30px #0004;z-index:6;backdrop-filter:blur(18px) saturate(1.5);-webkit-backdrop-filter:blur(18px) saturate(1.5)}
 nav button{flex:1;border:0;background:none;padding:8px 2px;border-radius:99px;color:var(--mu);font-size:11px;font-weight:700;cursor:pointer}
-nav button b{display:block;font-size:18px}nav button.on{background:var(--soft);color:var(--pr)}
+nav button b{display:grid;place-items:center;height:24px;margin-bottom:2px}nav button.on{background:var(--soft);color:var(--pr)}
 #toast{position:fixed;top:calc(14px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:9;display:flex;flex-direction:column;gap:8px;width:min(92%,420px)}
-#toast div{padding:12px 14px;border-radius:14px;background:var(--pr);color:#fff;font-weight:600;font-size:13px;box-shadow:0 6px 20px #0004}#toast .err{background:#c0392b}
+#toast div{animation:pop .3s ease;padding:12px 14px;border-radius:14px;background:var(--pr);color:#fff;font-weight:600;font-size:13px;box-shadow:0 6px 20px #0004}#toast .err{background:#c0392b}
 .tip{background:var(--soft);border-radius:14px;padding:10px 12px;font-size:13px;margin-bottom:12px}
 #login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
 #login .card{width:min(100%,380px);text-align:center;padding:26px}
@@ -57,7 +57,23 @@ nav button b{display:block;font-size:18px}nav button.on{background:var(--soft);c
 .stats b{display:block;font-size:22px;color:var(--pr)}.stats span{font-size:11px;color:var(--mu);font-weight:700}
 .tag.co{background:var(--co);color:#fff}
 .vis{display:flex;gap:8px;align-items:center;margin-top:10px}.vis input{flex:1;padding:9px 10px}
-a.ib{display:grid;place-items:center;text-decoration:none}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(60% 40% at 0% 0%,#92228C38,transparent),radial-gradient(50% 35% at 100% 25%,#E67F5229,transparent),radial-gradient(60% 40% at 50% 100%,#B8C14C22,transparent)}
+.card,header,#menu{backdrop-filter:blur(16px) saturate(1.5);-webkit-backdrop-filter:blur(16px) saturate(1.5)}
+header small{white-space:nowrap}
+svg{width:20px;height:20px;flex:none}
+#menu{position:absolute;right:16px;top:calc(100% + 6px);min-width:230px;padding:6px;border-radius:18px;border:1px solid var(--bd);background:color-mix(in srgb,var(--bg) 90%,transparent);box-shadow:0 12px 40px #0005;animation:pop .18s ease;transform-origin:top right}
+.mi{display:flex;align-items:center;gap:12px;width:100%;padding:12px;border:0;background:none;border-radius:12px;color:var(--tx);font-weight:600;font-size:14px;text-align:left;text-decoration:none;cursor:pointer}
+.mi:hover{background:var(--soft)}.mi svg{color:var(--pr)}
+@keyframes up{from{opacity:0;transform:translateY(12px)}}
+@keyframes pop{from{opacity:0;transform:scale(.92) translateY(-6px)}}
+@keyframes glow{50%{box-shadow:0 0 0 1px var(--li) inset,0 0 18px #B8C14C66}}
+.card{animation:up .45s cubic-bezier(.2,.8,.2,1) both}
+.card:nth-child(2){animation-delay:.05s}.card:nth-child(3){animation-delay:.1s}.card:nth-child(4){animation-delay:.15s}
+.card.nw{animation:up .45s both,glow 2.2s ease-in-out 3}
+.btn,.ib,.ghost,.acts button,nav button,.stats button,.opt{transition:transform .15s,background .25s,box-shadow .25s}
+.ib:active,.btn:active,.ghost:active,.acts button:active,nav button:active,.stats button:active{transform:scale(.94)}
+nav button b{transition:transform .25s}nav button.on b{transform:translateY(-2px) scale(1.12)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -80,13 +96,16 @@ a.ib{display:grid;place-items:center;text-decoration:none}
     <img src="icons/icon-192.png" alt="">
     <div><h1>Expedito</h1><small><span class="dot" id="dot"></span><span id="who"></span></small></div>
     <span class="sp"></span>
-    <a class="ib" id="bSheet" href="#" target="_blank" rel="noopener" hidden title="Ver Excel en Drive">📊</a>
-    <button class="ib" id="bCfg" hidden title="Ajustes">⚙️</button>
-    <button class="ib" id="bInst" hidden title="Instalar app">⬇️</button>
-    <button class="ib" id="bBell" title="Avisos">🔕</button>
-    <button class="ib" id="bTheme" title="Tema">🌙</button>
-    <button class="ib" id="bSwitch" title="Cambiar vista">⇄</button>
-    <button class="ib" id="bOut" title="Salir">⏻</button>
+    <button class="ib" id="bBell" title="Avisos"></button>
+    <button class="ib" id="bTheme" title="Tema"></button>
+    <button class="ib" id="bMenu" title="Menú" data-ic="more"></button>
+    <div id="menu" hidden>
+      <a class="mi" id="bSheet" href="#" target="_blank" rel="noopener" hidden><span data-ic="sheet"></span>Ver Excel en Drive</a>
+      <button class="mi" id="bCfg" hidden><span data-ic="sliders"></span>Ajustes de avisos</button>
+      <button class="mi" id="bInst" hidden><span data-ic="down"></span>Instalar app</button>
+      <button class="mi" id="bSwitch"><span data-ic="swap"></span>Cambiar vista</button>
+      <button class="mi" id="bOut"><span data-ic="out"></span>Salir</button>
+    </div>
   </header>
   <div class="tip" id="iosTip" hidden>Para instalar en iPhone: toca <b>Compartir</b> ⬆️ y luego <b>«Agregar a inicio»</b>. <button class="ghost" id="iosX">Cerrar</button></div>
 
@@ -132,9 +151,9 @@ a.ib{display:grid;place-items:center;text-decoration:none}
   </section>
 </div>
 <nav id="nav" hidden>
-  <button data-tab="alertas"><b>🔔</b>Alertas <span id="cnt"></span></button>
-  <button data-tab="visitas"><b>📅</b>Visitas</button>
-  <button data-tab="historial"><b>✅</b>Historial</button>
+  <button data-tab="alertas"><b data-ic="bell"></b>Alertas <span id="cnt"></span></button>
+  <button data-tab="visitas"><b data-ic="cal"></b>Visitas</button>
+  <button data-tab="historial"><b data-ic="check"></b>Historial</button>
 </nav>
 </div>
 
@@ -154,9 +173,20 @@ let role=localStorage.getItem("ms_role"),DB=[],tab="alertas",loaded=false,sig=""
 
 function toast(m,t){const d=document.createElement("div");if(t==="err")d.className="err";d.textContent=m;$("#toast").appendChild(d);setTimeout(()=>d.remove(),4000)}
 
+const IC={bell:'<path d="M6 8a6 6 0 0112 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 003.4 0"/>',
+belloff:'<path d="M6 8a6 6 0 0112 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 003.4 0M3 3l18 18"/>',
+sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+moon:'<path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/>',
+more:'<circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/>',
+sheet:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 9h16M4 15h16M10 3v18"/>',
+sliders:'<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',
+down:'<path d="M12 3v12M7 11l5 5 5-5M5 21h14"/>',swap:'<path d="M17 3l4 4-4 4M21 7H8M7 21l-4-4 4-4M3 17h13"/>',
+out:'<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>',
+cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',check:'<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>'};
+function ic(n){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+IC[n]+'</svg>'}
 // ---- Tema: por defecto el del dispositivo; si se cambia, se recuerda ----
 function theme(){const s=localStorage.getItem("ms_theme");const d=s?s==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
-document.documentElement.dataset.t=d?"dark":"light";$("meta[name=theme-color]").content=d?"#130f15":"#92228C";$("#bTheme").textContent=d?"☀️":"🌙"}
+document.documentElement.dataset.t=d?"dark":"light";$("meta[name=theme-color]").content=d?"#130f15":"#92228C";$("#bTheme").innerHTML=ic(d?"sun":"moon")}
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change",theme);
 $("#bTheme").onclick=()=>{localStorage.setItem("ms_theme",document.documentElement.dataset.t==="dark"?"light":"dark");theme()};
 theme();
@@ -169,7 +199,7 @@ $("#iosX").onclick=()=>{$("#iosTip").hidden=true;localStorage.setItem("ms_ios","
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 
 // ---- Avisos (sonido + notificación del sistema) ----
-function bell(){$("#bBell").textContent=("Notification"in window&&Notification.permission==="granted")?"🔔":"🔕"}
+function bell(){$("#bBell").innerHTML=ic(("Notification"in window&&Notification.permission==="granted")?"bell":"belloff")}
 $("#bBell").onclick=async()=>{if(!("Notification"in window))return toast("Este dispositivo no admite avisos","err");
 const p=await Notification.requestPermission();bell();toast(p==="granted"?"Avisos activados":"Avisos bloqueados en este dispositivo",p==="granted"?"":"err")};
 function beep(){try{const c=new(window.AudioContext||window.webkitAudioContext)(),t=c.currentTime;
@@ -254,6 +284,9 @@ else if(b.dataset.a==="x"){r.fechaVisita="";sig="";render();toast(await post({ac
 
 $("#list").onchange=async e=>{const i=e.target;if(i.dataset.a!=="d"||!i.value)return;const r=DB.find(x=>x.id===i.dataset.id);if(!r)return;r.fechaVisita=i.value;sig="";render();
 toast(await post({action:"updateStatus",id:r.id,fechaVisita:i.value})?"Fecha actualizada":"Error de conexión","")};
+document.querySelectorAll("[data-ic]").forEach(e=>e.insertAdjacentHTML("afterbegin",ic(e.dataset.ic)));
+$("#bMenu").onclick=e=>{e.stopPropagation();$("#menu").hidden=!$("#menu").hidden};
+addEventListener("click",()=>{$("#menu").hidden=true});
 if(role)start();
 </script>
 </body>
