@@ -81,6 +81,7 @@ a.ib{display:grid;place-items:center;text-decoration:none}
     <div><h1>MedSync</h1><small><span class="dot" id="dot"></span><span id="who"></span></small></div>
     <span class="sp"></span>
     <a class="ib" id="bSheet" href="#" target="_blank" rel="noopener" hidden title="Ver Excel en Drive">📊</a>
+    <button class="ib" id="bCfg" hidden title="Ajustes">⚙️</button>
     <button class="ib" id="bInst" hidden title="Instalar app">⬇️</button>
     <button class="ib" id="bBell" title="Avisos">🔕</button>
     <button class="ib" id="bTheme" title="Tema">🌙</button>
@@ -88,6 +89,13 @@ a.ib{display:grid;place-items:center;text-decoration:none}
     <button class="ib" id="bOut" title="Salir">⏻</button>
   </header>
   <div class="tip" id="iosTip" hidden>Para instalar en iPhone: toca <b>Compartir</b> ⬆️ y luego <b>«Agregar a inicio»</b>. <button class="ghost" id="iosX">Cerrar</button></div>
+
+  <div class="card" id="cfg" hidden>
+    <b>Ajustes de avisos</b>
+    <p class="mu">Recibe un correo cada vez que Lilliam registre un expediente nuevo.</p>
+    <div id="mailForm"><input type="text" id="mailIn" inputmode="email" autocapitalize="none" placeholder="tucorreo@ejemplo.com" style="margin-top:8px"><button class="btn" id="mailAdd" type="button" style="margin-top:10px">Activar avisos por correo</button></div>
+    <div id="mailOk" hidden><p>✓ Recibiendo avisos en <b id="mailTxt"></b></p><button class="ghost" id="mailDel" type="button">Dejar de recibir</button></div>
+  </div>
 
   <!-- VISTA LILLIAM -->
   <section id="vDra" hidden>
@@ -176,8 +184,17 @@ if(p==="bdalerta"&&(u==="lilliam"||u==="asistente")){role=u==="lilliam"?"dra":"a
 $("#bOut").onclick=()=>{localStorage.removeItem("ms_role");location.reload()};
 $("#bSwitch").onclick=()=>{role=role==="dra"?"asis":"dra";localStorage.setItem("ms_role",role);view()};
 function start(){$("#login").hidden=true;$("#app").hidden=false;bell();view();load();if(!timer)timer=setInterval(load,30000)}
-function view(){$("#bSheet").hidden=role!=="asis";$("#bSheet").href=SHEET;$("#vDra").hidden=role!=="dra";$("#vAsis").hidden=role!=="asis";$("#nav").hidden=role!=="asis";
+function view(){$("#bCfg").hidden=role!=="asis";if(role!=="asis")$("#cfg").hidden=true;$("#bSheet").hidden=role!=="asis";$("#bSheet").href=SHEET;$("#vDra").hidden=role!=="dra";$("#vAsis").hidden=role!=="asis";$("#nav").hidden=role!=="asis";
 $("#who").textContent=role==="dra"?"Dra. Lilliam":"Equipo asistente";sig="";render();renderRecent()}
+
+// ---- Ajustes: avisos por correo ----
+function mailUI(){const m=localStorage.getItem("ms_mail");$("#mailForm").hidden=!!m;$("#mailOk").hidden=!m;$("#mailTxt").textContent=m||""}
+$("#bCfg").onclick=()=>{$("#cfg").hidden=!$("#cfg").hidden;mailUI()};
+$("#mailAdd").onclick=async()=>{const m=$("#mailIn").value.trim().toLowerCase();
+if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m))return toast("Escribe un correo válido","err");
+if(await post({action:"subscribe",email:m})){localStorage.setItem("ms_mail",m);mailUI();toast("Listo. Te enviamos un correo de confirmación")}else toast("Error de conexión","err")};
+$("#mailDel").onclick=async()=>{const m=localStorage.getItem("ms_mail");
+if(await post({action:"unsubscribe",email:m})){localStorage.removeItem("ms_mail");mailUI();toast("Ya no recibirás correos")}else toast("Error de conexión","err")};
 
 // ---- Datos ----
 async function post(o){try{await fetch(API,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(o)});return true}catch(e){return false}}
