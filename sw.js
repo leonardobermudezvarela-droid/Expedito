@@ -1,6 +1,6 @@
-// Service Worker de MedSync Tracker
+// Service Worker de Expedito
 // Estrategia: red primero (siempre la versión más nueva), caché solo si no hay internet.
-const CACHE_NAME = 'medsync-v3';
+const CACHE_NAME = 'expedito-v4';
 const ASSETS = ['index.html', 'manifest.json'];
 
 self.addEventListener('install', e => {

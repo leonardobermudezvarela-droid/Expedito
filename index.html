@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>MedSync Tracker</title>
+<title>Expedito</title>
 <meta name="theme-color" content="#92228C">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/favicon-32.png">
@@ -66,7 +66,7 @@ a.ib{display:grid;place-items:center;text-decoration:none}
 <section id="login">
   <form class="card" id="fLogin">
     <img src="icons/icon-192.png" alt="">
-    <h2 style="margin:12px 0 2px">MedSync Tracker</h2>
+    <h2 style="margin:12px 0 2px">Expedito</h2>
     <p class="mu" style="margin:0 0 18px">Control de expedientes</p>
     <input type="text" id="u" placeholder="Usuario" autocapitalize="none" required style="margin-bottom:10px">
     <input type="password" id="p" placeholder="Contraseña" required style="margin-bottom:14px">
@@ -78,7 +78,7 @@ a.ib{display:grid;place-items:center;text-decoration:none}
 <div class="wrap">
   <header>
     <img src="icons/icon-192.png" alt="">
-    <div><h1>MedSync</h1><small><span class="dot" id="dot"></span><span id="who"></span></small></div>
+    <div><h1>Expedito</h1><small><span class="dot" id="dot"></span><span id="who"></span></small></div>
     <span class="sp"></span>
     <a class="ib" id="bSheet" href="#" target="_blank" rel="noopener" hidden title="Ver Excel en Drive">📊</a>
     <button class="ib" id="bCfg" hidden title="Ajustes">⚙️</button>
@@ -176,7 +176,7 @@ function beep(){try{const c=new(window.AudioContext||window.webkitAudioContext)(
 [660,880].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.frequency.value=f;o.connect(g);g.connect(c.destination);
 g.gain.setValueAtTime(.2,t+i*.18);g.gain.exponentialRampToValueAtTime(.001,t+i*.18+.16);o.start(t+i*.18);o.stop(t+i*.18+.17)})}catch(e){}}
 function notify(n){beep();if("Notification"in window&&Notification.permission==="granted"){const m=n+(n>1?" expedientes nuevos":" expediente nuevo"),o={body:m,icon:"icons/icon-192.png"};
-navigator.serviceWorker?.ready.then(r=>r.showNotification("MedSync",o)).catch(()=>{try{new Notification("MedSync",o)}catch(e){}})}}
+navigator.serviceWorker?.ready.then(r=>r.showNotification("Expedito",o)).catch(()=>{try{new Notification("Expedito",o)}catch(e){}})}}
 
 // ---- Sesión ----
 $("#fLogin").onsubmit=e=>{e.preventDefault();const u=$("#u").value.trim().toLowerCase(),p=$("#p").value.trim();
@@ -229,7 +229,7 @@ function dtag(f){const t=new Date();t.setHours(0,0,0,0);const n=Math.round((new 
 function ago(t){const m=String(t).match(/(\d+)\/(\d+)\/(\d+) (\d+):(\d+)/);if(!m)return"";const d=Math.round((Date.now()-new Date(m[3],m[2]-1,m[1],m[4],m[5]))/6e4);return d<1?"ahora":d<60?`hace ${d} min`:d<1440?`hace ${Math.floor(d/60)} h`:`hace ${Math.floor(d/1440)} d`}
 // ---- Vista asistentes ----
 function render(){if(role!=="asis")return;
-const pend=DB.filter(r=>r.estado==="Pendiente").length;$("#cnt").textContent=pend?`(${pend})`:"";document.title=(pend?`(${pend}) `:"")+"MedSync Tracker";
+const pend=DB.filter(r=>r.estado==="Pendiente").length;$("#cnt").textContent=pend?`(${pend})`:"";document.title=(pend?`(${pend}) `:"")+"Expedito";
 const q=$("#q").value.toLowerCase().trim(),s=JSON.stringify(DB)+tab+q;if(s===sig)return;sig=s;
 document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
 const nue=DB.filter(r=>r.estado==="Pendiente"&&r.esNuevo).length,vis=DB.filter(r=>r.fechaVisita).length;

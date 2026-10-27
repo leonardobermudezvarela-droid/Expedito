@@ -1,6 +1,6 @@
 {
-  "name": "MedSync Tracker",
-  "short_name": "MedSync",
+  "name": "Expedito",
+  "short_name": "Expedito",
   "description": "Control de expedientes y alertas para el equipo clínico",
   "lang": "es",
   "start_url": "./index.html",
