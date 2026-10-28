@@ -85,6 +85,7 @@ nav button b{transition:transform .25s}nav button.on b{transform:translateY(-2px
 .vd{margin-top:8px;border:1px solid var(--bd);border-radius:14px;padding:0 12px}
 .vd summary{display:flex;align-items:center;gap:8px;padding:10px 0;cursor:pointer;list-style:none}.vd summary::-webkit-details-marker{display:none}
 .vd .chips{margin-top:0;padding-bottom:10px}
+select{width:100%;padding:10px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}input[type=time]{padding:13px 10px;border-radius:14px;border:1px solid var(--bd);background:var(--bg);outline:none}.trk{display:grid;grid-template-columns:78px 1fr 1fr;gap:6px;align-items:center;margin-top:8px}.trk b{font-size:12px}.trk input{padding:10px}a.ghost{text-decoration:none;display:inline-block}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -147,9 +148,9 @@ nav button b{transition:transform .25s}nav button.on b{transform:translateY(-2px
       <div class="card">
         <label class="f">Fecha de llegada de la participante (opcional)</label>
         <input type="date" id="llegada" style="margin-bottom:12px">
-        <label class="f">Próxima visita (opcional)</label>
-        <input type="date" id="fecha" style="margin-bottom:12px">
-        <label class="f">Notas (opcional)</label>
+        <label class="f">Próxima visita y hora (opcional)</label>
+        <div class="row" style="margin-bottom:12px;flex-wrap:nowrap"><input type="date" id="fecha" style="flex:2"><input type="time" id="hora" style="flex:1"></div>
+        <label class="f">Formularios llenados por Lilliam</label><div class="seg" style="margin-bottom:12px"><label><input type="radio" name="comp" value="SÍ" checked><span>Completos</span></label><label><input type="radio" name="comp" value="NO"><span>Incompletos</span></label></div><label class="f">Notas (opcional)</label>
         <textarea id="notas" rows="2"></textarea>
       </div>
       <div class="card">
@@ -164,7 +165,7 @@ nav button b{transition:transform .25s}nav button.on b{transform:translateY(-2px
   <!-- VISTA ASISTENTES -->
   <section id="vAsis" hidden>
     <div class="stats" id="stats"></div>
-    <input type="search" id="q" placeholder="🔍 Buscar expediente o formulario" style="margin-bottom:12px">
+    <input type="text" id="me" placeholder="✍️ Tu nombre (quien trabaja en los expedientes)" style="margin-bottom:8px"><input type="search" id="q" placeholder="🔍 Buscar expediente o formulario" style="margin-bottom:12px">
     <div id="list"></div>
   </section>
 </div>
@@ -179,7 +180,7 @@ nav button b{transition:transform .25s}nav button.on b{transform:translateY(-2px
 // ====== ENLACES (cámbialos aquí si algún día se crea otra implementación) ======
 const API="https://script.google.com/macros/s/AKfycbzvdiMotbDGdDKUovmDbmkRU26dY-P4_1qtvWKbK4anQMV-cQD9XSDz98z_L_MLauOPFw/exec";
 const SHEET="https://docs.google.com/spreadsheets/d/1JWhtxnTkh0ZnyTk2fhlvGbwifNYXdAkc-akwJb-WdKA/edit?usp=sharing";
-const ASIST=["Alejandro","Leonardo","Dayana"];
+
 const G=[["1ª visita",["Cuestionario #1 (1visita)","Antropometría y bioimpedancia (1visita)"]],
 ["2ª visita",["Antropometría y bioimpedancia (2visita)"]],
 ["3ª visita",["Antropometría y bioimpedancia (3visita)","Agua corporal (3visita)"]],
@@ -252,7 +253,7 @@ async function post(o){try{await fetch(API,{method:"POST",mode:"no-cors",headers
 async function load(){let ok=true;
 try{const r=await fetch(API+"?t="+Date.now()),d=await r.json();if(!Array.isArray(d))throw 0;
 const prev=new Set(DB.map(x=>x.id));
-DB=d.map(w=>({id:w.ID,timestamp:w["Fecha Registro"],expediente:w.Expediente,esNuevo:w["Es Nuevo"]==="SÍ",estadoParticipante:w["Estado Participante"]||"Activo",fechaVisita:w["Fecha Visita"]||"",fechaLlegada:w["Fecha Llegada"]||"",formularios:(w.Formularios||"").split(", ").filter(Boolean),notas:w.Notas||"",estado:w.Estado||"Pendiente"}));
+DB=d.map(w=>({id:w.ID,timestamp:w["Fecha Registro"],expediente:w.Expediente,esNuevo:w["Es Nuevo"]==="SÍ",estadoParticipante:w["Estado Participante"]||"Activo",fechaVisita:w["Fecha Visita"]||"",fechaLlegada:w["Fecha Llegada"]||"",formularios:(w.Formularios||"").split(", ").filter(Boolean),notas:w.Notas||"",estado:w.Estado||"Pendiente",horaVisita:w["Hora Visita"]||"",completos:w["Formularios Completos"]!=="NO",bdE:w["BD Estado"]||"Sin iniciar",bdR:w["BD Responsable"]||"",rcE:w["RedCap Estado"]||"Sin iniciar",rcR:w["RedCap Responsable"]||"",obs:String(w.Observaciones||"").split("\n").filter(Boolean)}));
 const n=DB.filter(r=>r.estado==="Pendiente"&&!prev.has(r.id)).length;
 if(loaded&&n&&role==="asis")notify(n);loaded=true}catch(e){ok=false}
 $("#dot").className="dot"+(ok?"":" off");render();renderRecent()}
@@ -273,13 +274,21 @@ if(cal){if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(cm))return toast("Escribe tu corre
 if(!$("#llegada").value&&!(act&&$("#fecha").value))return toast("Elige al menos una fecha para el calendario","err");localStorage.setItem("ms_dmail",cm)}
 const d=new Date(),z=n=>String(n).padStart(2,"0");
 const rec={action:"add",id:"REG-"+Date.now(),timestamp:`${z(d.getDate())}/${z(d.getMonth()+1)}/${d.getFullYear()} ${z(d.getHours())}:${z(d.getMinutes())}:${z(d.getSeconds())}`,
-expediente:$("#exp").value.trim().toUpperCase(),esNuevo:$("#nuevo").checked,estadoParticipante:est,fechaVisita:act?$("#fecha").value:"",formularios:fm,notas:$("#notas").value.trim(),estado:"Pendiente",usuario:"Dra",fechaLlegada:$("#llegada").value,calendar:cal,calEmail:cm};
+expediente:$("#exp").value.trim().toUpperCase(),esNuevo:$("#nuevo").checked,estadoParticipante:est,fechaVisita:act?$("#fecha").value:"",horaVisita:act&&$("#fecha").value?$("#hora").value:"",completos:!act||document.querySelector("[name=comp]:checked").value==="SÍ",formularios:fm,notas:$("#notas").value.trim(),estado:"Pendiente",usuario:"Dra",fechaLlegada:$("#llegada").value,calendar:cal,calEmail:cm};
 const b=$("#send");b.disabled=true;b.textContent="Enviando…";
 await post(rec);await load();
 const ok=DB.some(r=>r.id===rec.id);
 toast(ok?"✓ Reporte enviado y confirmado en la hoja":"No se pudo confirmar el envío. Revisa la conexión e inténtalo de nuevo",ok?"":"err");
 if(ok){$("#fDra").reset();$("#forms").hidden=false;$("#exp").focus()}b.disabled=false;b.textContent="Enviar reporte"};
 
+function chk(r){return r.completos?"":'<p class="mu s"><span class="tag co">⚠ Formularios incompletos</span></p>'}
+function trk(r,edit){if(!/^(Pendiente|Completado)$/.test(r.estado))return"";return[["bd","Base de datos"],["rc","RedCap"]].map(([k,nm])=>{const e=r[k+"E"],p=r[k+"R"];return edit?`<div class="trk"><b>${nm}</b><select data-a="s" data-k="${k}" data-id="${esc(r.id)}">${["Sin iniciar","En proceso","Finalizado"].map(o=>`<option${o===e?" selected":""}>${o}</option>`).join("")}</select><input type="text" placeholder="¿Quién lo hace?" value="${esc(p)}" data-a="w" data-k="${k}" data-id="${esc(r.id)}"></div>`:`<p class="mu s">${nm}: <b>${e}</b>${p?" · "+esc(p):""}</p>`}).join("")}
+function obsH(r){return r.obs.map(o=>`<p class="mu s">💬 ${esc(o)}</p>`).join("")}
+function cd(r){const z=n=>String(n).padStart(2,"0"),y=d=>""+d.getFullYear()+z(d.getMonth()+1)+z(d.getDate()),[a,b,c]=r.fechaVisita.split("-").map(Number);
+if(!r.horaVisita)return[y(new Date(a,b-1,c)),y(new Date(a,b-1,c+1))];const[H,M]=r.horaVisita.split(":").map(Number),t=d=>y(d)+"T"+z(d.getHours())+z(d.getMinutes())+"00";return[t(new Date(a,b-1,c,H,M)),t(new Date(a,b-1,c,H+1,M))]}
+function gcal(r){const[s,e]=cd(r);return"https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent("Visita · Exp. "+r.expediente)+"&dates="+s+"/"+e+"&details="+encodeURIComponent("Expediente "+r.expediente)}
+function dl(r){const[s,e]=cd(r),t=r.horaVisita?"":";VALUE=DATE",c="BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Expedito//ES\r\nBEGIN:VEVENT\r\nUID:"+r.id+"@expedito\r\nDTSTAMP:"+new Date().toISOString().replace(/[-:]|\.\d+/g,"")+"\r\nDTSTART"+t+":"+s+"\r\nDTEND"+t+":"+e+"\r\nSUMMARY:Visita · Exp. "+r.expediente+"\r\nBEGIN:VALARM\r\nTRIGGER:"+(r.horaVisita?"-PT1H":"-PT15H")+"\r\nACTION:DISPLAY\r\nDESCRIPTION:Visita\r\nEND:VALARM\r\nEND:VEVENT\r\nEND:VCALENDAR",a=document.createElement("a");
+a.href=URL.createObjectURL(new Blob([c],{type:"text/calendar"}));a.download="visita-"+r.expediente+".ics";a.click()}
 function ec(e){return e==="Activo"?"st-a":e==="Finalizó"?"st-f":"st-r"}
 function forms(r){const used=new Set();let h="";
 G.forEach(g=>{const m=g[1].filter(f=>r.formularios.includes(f));if(!m.length)return;m.forEach(f=>used.add(f));
@@ -287,13 +296,13 @@ h+=`<details class="vd"${tab==="alertas"?" open":""}><summary><b>${g[0]}</b><spa
 const o=r.formularios.filter(f=>!used.has(f));
 if(o.length)h+=`<div class="chips">${o.map(f=>`<span class="chip">${esc(f)}</span>`).join("")}</div>`;return h}
 function renderRecent(){if(role!=="dra")return;const it=DB.slice(-5).reverse();
-$("#recent").innerHTML=it.length?it.map(r=>`<div class="card"><div class="row"><b>${esc(r.expediente)}</b><span class="sp"></span><span class="tag ${r.estado==="Pendiente"?"co":""}">${r.estado==="Pendiente"?"Pendiente":"✓ "+esc(r.estado)}</span></div><p class="mu s">${esc(r.timestamp)}</p></div>`).join(""):'<div class="empty">Aún no hay envíos</div>'}
+$("#recent").innerHTML=it.length?it.map(r=>`<div class="card"><div class="row"><b>${esc(r.expediente)}</b><span class="sp"></span><span class="tag ${r.estado==="Pendiente"?"co":""}">${r.estado==="Pendiente"?"Pendiente":"✓ "+esc(r.estado)}</span></div><p class="mu s">${esc(r.timestamp)}</p>${chk(r)}${trk(r,0)}${obsH(r)}</div>`).join(""):'<div class="empty">Aún no hay envíos</div>'}
 function dtag(f){const t=new Date();t.setHours(0,0,0,0);const n=Math.round((new Date(f+"T00:00:00")-t)/864e5);return n<0?'<span class="tag co">Vencida</span>':n===0?'<span class="tag lime">Hoy</span>':n===1?'<span class="tag">Mañana</span>':""}
 function ago(t){const m=String(t).match(/(\d+)\/(\d+)\/(\d+) (\d+):(\d+)/);if(!m)return"";const d=Math.round((Date.now()-new Date(m[3],m[2]-1,m[1],m[4],m[5]))/6e4);return d<1?"ahora":d<60?`hace ${d} min`:d<1440?`hace ${Math.floor(d/60)} h`:`hace ${Math.floor(d/1440)} d`}
 // ---- Vista asistentes ----
 function render(){if(role!=="asis")return;
 const pend=DB.filter(r=>r.estado==="Pendiente").length;$("#cnt").textContent=pend?`(${pend})`:"";document.title=(pend?`(${pend}) `:"")+"Expedito";
-const q=$("#q").value.toLowerCase().trim(),s=JSON.stringify(DB)+tab+q;if(s===sig)return;sig=s;
+const q=$("#q").value.toLowerCase().trim(),s=JSON.stringify(DB)+tab+q;if(s===sig)return;if(document.activeElement?.matches("#list input,#list select"))return;sig=s;
 document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
 const nue=DB.filter(r=>r.estado==="Pendiente"&&r.esNuevo).length,vis=DB.filter(r=>r.fechaVisita).length;
 $("#stats").innerHTML=`<button data-tab="alertas"><b>${pend}</b><span>Pendientes</span></button><button data-tab="alertas"><b>${nue}</b><span>Nuevas</span></button><button data-tab="visitas"><b>${vis}</b><span>Visitas</span></button>`;
@@ -302,21 +311,27 @@ it=tab==="alertas"?it.filter(r=>r.estado==="Pendiente"):tab==="visitas"?it.filte
 $("#list").innerHTML=it.length?it.map(r=>`<div class="card ${r.esNuevo&&r.estado==="Pendiente"?"nw":""}">
 <div class="row"><b class="exp">${esc(r.expediente)}</b>${r.esNuevo?'<span class="tag lime">NUEVA</span>':""}<span class="tag ${ec(r.estadoParticipante)}">${esc(r.estadoParticipante)}</span></div>
 ${forms(r)}
-${r.fechaVisita?`<div class="vis">📅 <input type="date" value="${esc(r.fechaVisita)}" data-a="d" data-id="${esc(r.id)}">${dtag(r.fechaVisita)}<button class="ghost" data-a="x" data-id="${esc(r.id)}">Quitar</button></div>`:""}${r.fechaLlegada?`<p class="mu">Llegada: ${esc(r.fechaLlegada)}</p>`:""}${r.notas?`<p class="mu">📝 ${esc(r.notas)}</p>`:""}
+${r.fechaVisita?`<div class="vis">📅 <input type="date" value="${esc(r.fechaVisita)}" data-a="d" data-id="${esc(r.id)}"><input type="time" value="${esc(r.horaVisita)}" data-a="t" data-id="${esc(r.id)}">${dtag(r.fechaVisita)}<button class="ghost" data-a="x" data-id="${esc(r.id)}">Quitar</button></div><div class="row" style="margin-top:8px"><a class="ghost" target="_blank" rel="noopener" href="${esc(gcal(r))}">＋ Google Calendar</a><button class="ghost" data-a="c" data-id="${esc(r.id)}">＋ Apple / Outlook</button></div>`:""}${r.fechaLlegada?`<p class="mu">Llegada: ${esc(r.fechaLlegada)}</p>`:""}${r.notas?`<p class="mu">📝 ${esc(r.notas)}</p>`:""}
 <p class="mu s">${esc(r.timestamp)} · ${ago(r.timestamp)} · ${esc(r.estado)}</p>
-${r.estado==="Pendiente"?`<input type="text" id="n-${esc(r.id)}" placeholder="Nota (opcional)" style="margin-top:10px"><div class="acts">${ASIST.map(n=>`<button data-a="p" data-id="${esc(r.id)}" data-n="${n}">${n}</button>`).join("")}</div>`
-:`<div style="margin-top:10px"><button class="ghost" data-a="r" data-id="${esc(r.id)}">Regresar a pendiente</button></div>`}</div>`).join("")
+${chk(r)}${trk(r,r.estado==="Pendiente")}${obsH(r)}${r.estado==="Pendiente"?`<div class="row" style="margin-top:10px;flex-wrap:nowrap"><input type="text" id="o-${esc(r.id)}" placeholder="Observación de datos faltantes (opcional)"><button class="ghost" data-a="o" data-id="${esc(r.id)}">Enviar a la Dra.</button></div>`:`<div style="margin-top:10px"><button class="ghost" data-a="r" data-id="${esc(r.id)}">Regresar a pendiente</button></div>`}</div>`).join("")
 :`<div class="empty">${tab==="alertas"?"🎉 No hay alertas pendientes":"Nada por aquí"}</div>`}
-$("#q").oninput=render;$("#stats").onclick=e=>{const t=e.target.closest("button")?.dataset.tab;if(t){tab=t;render()}};
+$("#me").value=localStorage.getItem("ms_nombre")||"";$("#me").oninput=()=>localStorage.setItem("ms_nombre",$("#me").value.trim());$("#q").oninput=render;$("#stats").onclick=e=>{const t=e.target.closest("button")?.dataset.tab;if(t){tab=t;render()}};
 $("#nav").onclick=e=>{const t=e.target.closest("button")?.dataset.tab;if(t){tab=t;render()}};
-$("#list").onclick=async e=>{const b=e.target.closest("[data-a]");if(!b||b.dataset.a==="d")return;const r=DB.find(x=>x.id===b.dataset.id);if(!r)return;
-if(b.dataset.a==="p"){const n=b.dataset.n,t=(document.getElementById("n-"+r.id)?.value||"").trim();
-r.notas=t?(r.notas?r.notas+" | ":"")+`[Nota ${n}]: ${t}`:r.notas;r.estado="Procesado por "+n;sig="";render();
-toast(await post({action:"updateStatus",id:r.id,statusValue:r.estado,notas:r.notas})?"Registrado por "+n:"Error de conexión","");}
-else if(b.dataset.a==="x"){r.fechaVisita="";sig="";render();toast(await post({action:"updateStatus",id:r.id,fechaVisita:""})?"Fecha eliminada":"Error de conexión","")}else{r.estado="Pendiente";sig="";render();await post({action:"updateStatus",id:r.id,statusValue:"Pendiente"});toast("Regresado a pendientes","")}};
-
-$("#list").onchange=async e=>{const i=e.target;if(i.dataset.a!=="d"||!i.value)return;const r=DB.find(x=>x.id===i.dataset.id);if(!r)return;r.fechaVisita=i.value;sig="";render();
-toast(await post({action:"updateStatus",id:r.id,fechaVisita:i.value})?"Fecha actualizada":"Error de conexión","")};
+const up=async(r,o,m)=>{sig="";render();const ok=await post({action:"updateStatus",id:r.id,...o});toast(ok?m:"Error de conexión",ok?"":"err")};
+$("#list").onclick=async e=>{const b=e.target.closest("[data-a]");if(!b||!/^[xroc]$/.test(b.dataset.a))return;const r=DB.find(x=>x.id===b.dataset.id),a=b.dataset.a;if(!r)return;
+if(a==="c")return dl(r);
+if(a==="x"){r.fechaVisita=r.horaVisita="";return up(r,{fechaVisita:"",horaVisita:""},"Fecha eliminada")}
+if(a==="r"){r.estado="Pendiente";r.bdE=r.rcE="En proceso";return up(r,{statusValue:"Pendiente",bdEstado:"En proceso",rcEstado:"En proceso"},"Regresado a pendientes")}
+const i=document.getElementById("o-"+r.id),t=i.value.trim(),n=$("#me").value.trim();if(!t)return toast("Escribe la observación","err");if(!n)return toast("Escribe tu nombre arriba","err");
+r.obs.push("[ahora] "+n+": "+t);i.value="";sig="";render();const ok=await post({action:"addObs",id:r.id,texto:t,autor:n});toast(ok?"Observación enviada a la Dra.":"Error de conexión",ok?"":"err")};
+$("#list").onchange=async e=>{const i=e.target,a=i.dataset.a,r=DB.find(x=>x.id===i.dataset.id);if(!r||!a)return;
+if(a==="d"){if(!i.value)return;r.fechaVisita=i.value;i.blur();return up(r,{fechaVisita:i.value},"Fecha actualizada")}
+if(a==="t"){r.horaVisita=i.value;i.blur();return up(r,{horaVisita:i.value},i.value?"Hora actualizada":"Hora quitada")}
+const k=i.dataset.k;
+if(a==="w"){r[k+"R"]=i.value.trim();return up(r,{[k+"Resp"]:r[k+"R"]},"Responsable guardado")}
+if(a==="s"){const n=r[k+"R"]||$("#me").value.trim();if(i.value!=="Sin iniciar"&&!n){i.value=r[k+"E"];return toast("Escribe quién lo está haciendo (tu nombre arriba o en el campo)","err")}
+r[k+"E"]=i.value;r[k+"R"]=n;if(r.bdE==="Finalizado"&&r.rcE==="Finalizado")r.estado="Completado";i.blur();
+up(r,{[k+"Estado"]:i.value,[k+"Resp"]:n},r.estado==="Completado"?"✓ Completado en Base de datos y RedCap":"Estado actualizado")}};
 document.querySelectorAll("[data-ic]").forEach(e=>e.insertAdjacentHTML("afterbegin",ic(e.dataset.ic)));
 $("#bMenu").onclick=e=>{e.stopPropagation();$("#menu").hidden=!$("#menu").hidden};
 addEventListener("click",()=>{$("#menu").hidden=true});
