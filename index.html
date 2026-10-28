@@ -89,6 +89,12 @@ select{width:100%;padding:10px;border-radius:12px;border:1px solid var(--bd);bac
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 .alert-form{display:grid;gap:12px}.alert-form textarea{min-height:82px}.alert-card{border-left:4px solid var(--co)}.alert-card.done{border-left-color:#2e9e5b}.fabplus{font-size:23px!important;font-weight:800!important;background:var(--pr)!important;color:white!important;min-width:48px;max-width:54px;flex:1.1!important}
+.dra-island{display:flex;gap:5px;padding:6px;margin:0 0 16px;border:1px solid var(--bd);border-radius:999px;background:var(--card);box-shadow:0 8px 25px #0001;position:sticky;top:74px;z-index:4;backdrop-filter:blur(16px)}
+.dra-island button{flex:1;min-width:0;border:0;background:transparent;color:var(--mu);border-radius:999px;padding:11px 5px;font-size:12px;font-weight:750;cursor:pointer}
+.dra-island button.on{background:var(--soft);color:var(--pr);box-shadow:0 2px 8px #92228c12}
+#cfg{position:relative}.settings-title{display:flex;align-items:center;gap:8px;margin-bottom:6px}.settings-section{border-top:1px solid var(--bd);padding-top:12px;margin-top:12px}
+.form-select{display:grid;gap:6px}.form-select select{padding:13px 14px;border-radius:14px}
+nav button{min-height:58px}nav button.on{box-shadow:0 2px 8px #92228c12}
 </style>
 </head>
 <body>
@@ -125,12 +131,31 @@ select{width:100%;padding:10px;border-radius:12px;border:1px solid var(--bd);bac
     </div>
   </header>
   <div class="tip" id="iosTip" hidden>Para instalar en iPhone: toca <b>Compartir</b> ⬆️ y luego <b>«Agregar a inicio»</b>. <button class="ghost" id="iosX">Cerrar</button></div>
+  <div class="dra-island" id="draIsland" hidden aria-label="Secciones de la Dra. Lilliam">
+    <button type="button" data-dratab="reportes" class="on">＋ Reportes</button>
+    <button type="button" data-dratab="alertas">♧ Alertas</button>
+    <button type="button" data-dratab="historial">◷ Historial</button>
+  </div>
 
   <div class="card" id="cfg" hidden>
-    <b>Ajustes de avisos</b>
-    <p class="mu">Recibe un correo cada vez que Lilliam registre un expediente nuevo.</p>
-    <div id="mailForm"><input type="text" id="mailIn" inputmode="email" autocapitalize="none" placeholder="tucorreo@ejemplo.com" style="margin-top:8px"><label class="opt"><input type="checkbox" id="calOpt"><span>Agregar las visitas a mi calendario</span></label><button class="btn" id="mailAdd" type="button" style="margin-top:10px">Activar avisos por correo</button></div>
-    <div id="mailOk" hidden><p>✓ Recibiendo avisos en <b id="mailTxt"></b></p><label class="opt" style="margin-bottom:10px"><input type="checkbox" id="calOpt2"><span>Agregar las visitas a mi calendario</span></label><button class="ghost" id="mailDel" type="button">Dejar de recibir</button></div>
+    <div class="settings-title"><span data-ic="bell"></span><b>Notificaciones y preferencias</b></div>
+    <p class="mu">Configura aquí el correo que Expedito utilizará para avisos y eventos de calendario.</p>
+    <div id="assistantNotifySettings">
+      <label class="f" style="margin-top:12px">Tu correo</label>
+      <input type="text" id="mailIn" inputmode="email" autocapitalize="none" placeholder="tu.correo@ucr.ac.cr">
+      <label class="opt"><input type="checkbox" id="calOpt"><span>Recibir invitaciones de visitas en mi calendario</span></label>
+      <label class="opt"><input type="checkbox" id="assistantMailOpt" checked><span>Recibir correos cuando se registren expedientes nuevos</span></label>
+      <button class="btn" id="mailAdd" type="button" style="margin-top:10px">Guardar preferencias</button>
+      <p class="mu s" id="mailStatus"></p>
+    </div>
+    <div id="draNotifySettings" hidden>
+      <div class="settings-section">
+        <label class="f">Correo de la Dra. Lilliam</label><input type="text" id="draEmail" inputmode="email" autocapitalize="none" placeholder="correo@ucr.ac.cr">
+        <label class="opt"><input type="checkbox" id="draNotify"><span>Recibir correos por observaciones y nuevas alertas de corrección</span></label>
+        <button class="btn" id="saveDraPrefs" type="button" style="margin-top:10px">Guardar preferencias</button>
+      </div>
+    </div>
+    <div class="settings-section"><button class="ghost" id="browserNotify" type="button">Activar notificaciones de este dispositivo</button></div>
   </div>
 
   <!-- VISTA LILLIAM -->
@@ -174,22 +199,15 @@ select{width:100%;padding:10px;border-radius:12px;border:1px solid var(--bd);bac
   </section>
   <section id="vAlertas" hidden>
     <div class="card hero"><h2>Alertas de corrección</h2><p>Solicitudes para revisar formularios o preguntas de un expediente.</p></div>
-    <div id="alertPrefs" class="card" hidden>
-      <b>Notificaciones de la Dra. Lilliam</b>
-      <p class="mu">Active esta opción para recibir correos cuando un asistente deje una observación o cree una alerta.</p>
-      <label class="opt"><input type="checkbox" id="draNotify"><span>Recibir correos de observaciones y alertas</span></label>
-      <label class="f" style="margin-top:12px">Correo de la Dra. Lilliam</label>
-      <input type="text" id="draEmail" inputmode="email" placeholder="correo@ucr.ac.cr">
-      <button class="btn" id="saveDraPrefs" type="button" style="margin-top:10px">Guardar preferencias</button>
-    </div>
+
     <form id="alertForm" class="card alert-form" hidden>
       <h3 style="margin:0">Crear alerta para la Dra. Lilliam</h3>
       <label class="f">Código del expediente</label><input id="aExp" type="text" placeholder="Ej. CRM01" required autocapitalize="characters">
-      <label class="f">Formulario que se debe corregir</label><div id="alertFormChoices"></div>
+      <label class="f">Formulario que se debe corregir</label><div class="form-select"><select id="alertFormSelect" required><option value="">Selecciona un formulario…</option></select></div>
       <label class="f">Pregunta que debe revisar la Dra.</label><textarea id="aQuestion" placeholder="Indique la pregunta o el apartado que requiere revisión" required></textarea>
       <label class="f">Observaciones del asistente</label><textarea id="aNotes" placeholder="Explique qué debe corregirse o qué duda tiene" required></textarea>
       <label class="f">Nombre de quien crea la alerta</label><input id="aCreator" type="text" placeholder="Nombre y apellido" required>
-      <label class="f">Correo para recibir aviso cuando se corrija</label><input id="aCreatorEmail" type="text" inputmode="email" placeholder="tu.correo@ucr.ac.cr" required>
+      <input id="aCreatorEmail" type="hidden">
       <button class="btn" id="sendAlert" type="submit">Enviar alerta</button>
       <button class="ghost" id="cancelAlert" type="button">Cancelar</button>
     </form>
@@ -198,7 +216,7 @@ select{width:100%;padding:10px;border-radius:12px;border:1px solid var(--bd);bac
 </div>
 <nav id="nav" hidden>
   <button data-tab="alertas"><b data-ic="bell"></b>Alertas <span id="cnt"></span></button>
-  <button data-tab="nueva"><b>＋</b>Nueva</button>
+  <button data-tab="nueva"><b>＋</b>Crear</button>
   <button data-tab="visitas"><b data-ic="cal"></b>Visitas</button>
   <button data-tab="historial"><b data-ic="check"></b>Historial</button>
 </nav>
@@ -216,7 +234,7 @@ const G=[["1ª visita",["Cuestionario #1 (1visita)","Antropometría y bioimpedan
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-let role=localStorage.getItem("ms_role"),DB=[],ALERTS=[],ALERT_PREFS={enabled:false,email:""},tab="alertas",loaded=false,sig="",timer=null;
+let role=localStorage.getItem("ms_role"),DB=[],ALERTS=[],ALERT_PREFS={enabled:false,email:""},tab="alertas",draTab="reportes",loaded=false,sig="",timer=null;
 
 function toast(m,t){const d=document.createElement("div");if(t==="err")d.className="err";d.textContent=m;$("#toast").appendChild(d);setTimeout(()=>d.remove(),4000)}
 
@@ -247,8 +265,8 @@ if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWork
 
 // ---- Avisos (sonido + notificación del sistema) ----
 function bell(){$("#bBell").innerHTML=ic(("Notification"in window&&Notification.permission==="granted")?"bell":"belloff")}
-$("#bBell").onclick=async()=>{if(!("Notification"in window))return toast("Este dispositivo no admite avisos","err");
-const p=await Notification.requestPermission();bell();toast(p==="granted"?"Avisos activados":"Avisos bloqueados en este dispositivo",p==="granted"?"":"err")};
+$("#bBell").onclick=()=>{const open=$("#cfg").hidden;$("#cfg").hidden=!open;if(open){mailUI();if(role==="dra")loadAlertPrefs()} };
+$("#browserNotify").onclick=async()=>{if(!( "Notification"in window))return toast("Este dispositivo no admite avisos","err");const p=await Notification.requestPermission();bell();toast(p==="granted"?"Notificaciones del dispositivo activadas":"Permiso de notificaciones no concedido",p==="granted"?"":"err")};
 function beep(){try{const c=new(window.AudioContext||window.webkitAudioContext)(),t=c.currentTime;
 [660,880].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.frequency.value=f;o.connect(g);g.connect(c.destination);
 g.gain.setValueAtTime(.2,t+i*.18);g.gain.exponentialRampToValueAtTime(.001,t+i*.18+.16);o.start(t+i*.18);o.stop(t+i*.18+.17)})}catch(e){}}
@@ -261,21 +279,17 @@ if(p==="bdalerta"&&(u==="lilliam"||u==="asistente")){role=u==="lilliam"?"dra":"a
 $("#bOut").onclick=()=>{localStorage.removeItem("ms_role");location.reload()};
 $("#bSwitch").onclick=()=>{role=role==="dra"?"asis":"dra";localStorage.setItem("ms_role",role);view()};
 function start(){$("#login").hidden=true;$("#app").hidden=false;bell();view();load();if(!timer)timer=setInterval(load,30000)}
-function view(){$("#bCfg").hidden=role!=="asis";if(role!=="asis")$("#cfg").hidden=true;$("#bSheet").hidden=role!=="asis";$("#bSheet").href=SHEET;$("#vDra").hidden=role!=="dra";$("#vAsis").hidden=role!=="asis";$("#vAlertas").hidden=true;$("#bBackDra").hidden=role!=="dra";$("#nav").hidden=role!=="asis";
-$("#who").textContent=role==="dra"?"Dra. Lilliam":"Equipo asistente";sig="";render();renderRecent();loadAlerts();if(role==="dra")loadAlertPrefs()}
+function view(){$("#bCfg").hidden=true;$("#bSheet").hidden=role!=="asis";$("#bSheet").href=SHEET;$("#vDra").hidden=role!=="dra";$("#vAsis").hidden=role!=="asis";$("#vAlertas").hidden=true;$("#draIsland").hidden=role!=="dra";$("#bBackDra").hidden=true;$("#nav").hidden=role!=="asis";$("#assistantNotifySettings").hidden=role!=="asis";$("#draNotifySettings").hidden=role!=="dra";
+$("#who").textContent=role==="dra"?"Dra. Lilliam":"Equipo asistente";sig="";render();renderRecent();loadAlerts();if(role==="dra"){loadAlertPrefs();applyDraTab()}} 
+function applyDraTab(){if(role!=="dra")return;document.querySelectorAll("[data-dratab]").forEach(b=>b.classList.toggle("on",b.dataset.dratab===draTab));$("#vDra").hidden=draTab!=="reportes";$("#vAlertas").hidden=draTab==="reportes";$("#alertForm").hidden=draTab!=="alertas";const h=$("#vAlertas").querySelector("h3");if(h)h.textContent=draTab==="historial"?"Historial de alertas":"Alertas de corrección";if(draTab==="historial"){$("#alertForm").hidden=true;$("#vAlertas").scrollIntoView({behavior:"smooth",block:"start"})}}
+document.querySelectorAll("[data-dratab]").forEach(b=>b.onclick=()=>{draTab=b.dataset.dratab;applyDraTab();if(draTab==="alertas"){$("#alertForm").hidden=false}loadAlerts()});
 
-// ---- Ajustes: avisos por correo ----
-function mailUI(){const m=localStorage.getItem("ms_mail");$("#mailForm").hidden=!!m;$("#mailOk").hidden=!m;$("#mailTxt").textContent=m||"";$("#calOpt2").checked=localStorage.getItem("ms_cal")==="1"}
-$("#bCfg").onclick=()=>{$("#cfg").hidden=!$("#cfg").hidden;mailUI()};
-$("#mailAdd").onclick=async()=>{const m=$("#mailIn").value.trim().toLowerCase();
-if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m))return toast("Escribe un correo válido","err");
-if(await post({action:"subscribe",email:m,calendar:$("#calOpt").checked})){localStorage.setItem("ms_mail",m);localStorage.setItem("ms_cal",$("#calOpt").checked?"1":"0");mailUI();toast("Listo. Te enviamos un correo de confirmación")}else toast("Error de conexión","err")};
-$("#mailDel").onclick=async()=>{const m=localStorage.getItem("ms_mail");
-if(await post({action:"unsubscribe",email:m})){localStorage.removeItem("ms_mail");mailUI();toast("Ya no recibirás correos")}else toast("Error de conexión","err")};
 
-$("#calOpt2").onchange=async()=>{const m=localStorage.getItem("ms_mail"),on=$("#calOpt2").checked;
-if(await post({action:"subscribe",email:m,calendar:on})){localStorage.setItem("ms_cal",on?"1":"0");toast(on?"Las visitas se agregarán a tu calendario":"Ya no se agregarán a tu calendario")}else{$("#calOpt2").checked=!on;toast("Error de conexión","err")}};
-
+// ---- Preferencias de notificaciones y correo ----
+function mailUI(){const m=localStorage.getItem("ms_mail")||"";$("#mailIn").value=m;$("#calOpt").checked=localStorage.getItem("ms_cal")==="1";$("#assistantMailOpt").checked=localStorage.getItem("ms_mail_enabled")!=="0";$("#mailStatus").textContent=m?"Correo guardado: "+m:"Agrega tu correo para recibir avisos y usarlo en invitaciones de calendario."}
+$("#mailAdd").onclick=async()=>{const m=$("#mailIn").value.trim().toLowerCase(),cal=$("#calOpt").checked,mailOn=$("#assistantMailOpt").checked;if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m))return toast("Escribe un correo válido","err");if(mailOn){const ok=await post({action:"subscribe",email:m,calendar:cal,notifications:mailOn});if(!ok)return toast("No se pudo guardar. Revisa la conexión","err")}else{const ok=await post({action:"subscribe",email:m,calendar:cal,notifications:false});if(!ok)return toast("No se pudo guardar. Revisa la conexión","err")}localStorage.setItem("ms_mail",m);localStorage.setItem("ms_cal",cal?"1":"0");localStorage.setItem("ms_mail_enabled",mailOn?"1":"0");mailUI();toast("Preferencias guardadas")};
+$("#saveDraPrefs").onclick=async()=>{const email=$("#draEmail").value.trim().toLowerCase(),enabled=$("#draNotify").checked;if(enabled&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))return toast("Escriba un correo válido","err");const ok=await post({action:"setAlertPrefs",enabled,email});if(!ok)return toast("No se pudo guardar. Revisa la conexión","err");localStorage.setItem("ms_dra_email",email);if(email)$("#calMail").value=email;ALERT_PREFS={enabled,email};toast("Preferencias guardadas")};
+async function loadAlertPrefs(){try{const d=await fetch(API+"?tipo=preferencias&t="+Date.now()).then(r=>r.json());if(d&&typeof d==="object"){ALERT_PREFS=d;$("#draNotify").checked=!!d.enabled;$("#draEmail").value=d.email||localStorage.getItem("ms_dra_email")||""}}catch(e){$("#draEmail").value=localStorage.getItem("ms_dra_email")||""}}
 // ---- Datos ----
 async function post(o){try{await fetch(API,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(o)});return true}catch(e){return false}}
 async function load(){let ok=true;
@@ -291,7 +305,7 @@ $("#forms").innerHTML=G.map((g,i)=>`<details class="card grp"><summary><b>${g[0]
 function cnt(){G.forEach((g,i)=>{const n=document.querySelectorAll(`[data-g="${i}"]:checked`).length,e=$("#gc"+i);e.textContent=n+"/"+g[1].length;e.classList.toggle("on",n>0)})}
 $("#forms").onclick=e=>{const i=e.target.dataset.all;if(i==null)return;e.preventDefault();const c=[...document.querySelectorAll(`[data-g="${i}"]`)],on=c.some(x=>!x.checked);c.forEach(x=>x.checked=on);cnt()};
 $("#forms").onchange=cnt;$("#fDra").addEventListener("reset",()=>setTimeout(()=>{cnt();$("#calBox").hidden=true;$("#calMail").value=localStorage.getItem("ms_dmail")||""}));
-$("#cal").onchange=()=>{$("#calBox").hidden=!$("#cal").checked};$("#calMail").value=localStorage.getItem("ms_dmail")||"";
+$("#cal").onchange=()=>{$("#calBox").hidden=!$("#cal").checked;if($("#cal").checked)$("#calMail").value=localStorage.getItem("ms_dra_email")||$("#draEmail").value||""};$("#calMail").value=localStorage.getItem("ms_dmail")||"";
 document.querySelectorAll("[name=est]").forEach(r=>r.onchange=()=>{$("#forms").hidden=document.querySelector("[name=est]:checked").value!=="Activo"});
 $("#fDra").onsubmit=async e=>{e.preventDefault();const est=document.querySelector("[name=est]:checked").value,act=est==="Activo";
 const fm=act?[...document.querySelectorAll("[name=fm]:checked")].map(x=>x.value):["[Cambio de Estado: "+est+"]"];
@@ -330,6 +344,7 @@ function ago(t){const m=String(t).match(/(\d+)\/(\d+)\/(\d+) (\d+):(\d+)/);if(!m
 // ---- Vista asistentes ----
 function render(){if(role!=="asis")return;
 $("#vAlertas").hidden=tab!=="nueva";$("#vAsis").hidden=tab==="nueva";
+document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
 if(tab==="nueva"){renderAlerts();return}
 const pend=DB.filter(r=>r.estado==="Pendiente").length;$("#cnt").textContent=pend?`(${pend})`:"";document.title=(pend?`(${pend}) `:"")+"Expedito";
 const q=$("#q").value.toLowerCase().trim(),s=JSON.stringify(DB)+tab+q;if(s===sig)return;if(document.activeElement?.matches("#list input,#list select"))return;sig=s;
@@ -346,7 +361,7 @@ ${r.fechaVisita?`<div class="vis">📅 <input type="date" value="${esc(r.fechaVi
 ${chk(r)}${trk(r,r.estado==="Pendiente")}${obsH(r)}${r.estado==="Pendiente"?`<div class="row" style="margin-top:10px;flex-wrap:nowrap"><input type="text" id="o-${esc(r.id)}" placeholder="Observación de datos faltantes (opcional)"><button class="ghost" data-a="o" data-id="${esc(r.id)}">Enviar a la Dra.</button></div>`:`<div style="margin-top:10px"><button class="ghost" data-a="r" data-id="${esc(r.id)}">Regresar a pendiente</button></div>`}</div>`).join("")
 :`<div class="empty">${tab==="alertas"?"🎉 No hay alertas pendientes":"Nada por aquí"}</div>`}
 $("#q").oninput=render;$("#stats").onclick=e=>{const t=e.target.closest("button")?.dataset.tab;if(t){tab=t;render()}};
-$("#nav").onclick=e=>{const t=e.target.closest("button")?.dataset.tab;if(t){tab=t;if(t==="nueva"){$("#alertForm").hidden=false;$("#alertForm").scrollIntoView({behavior:"smooth",block:"start"})}else $("#alertForm").hidden=true;render();loadAlerts()}};
+$("#nav").onclick=e=>{const t=e.target.closest("button")?.dataset.tab;if(t){tab=t;sig="";if(t==="nueva"){$("#alertForm").hidden=false;$("#alertForm").scrollIntoView({behavior:"smooth",block:"start"})}else $("#alertForm").hidden=true;render();loadAlerts()}};
 const up=async(r,o,m)=>{sig="";render();const ok=await post({action:"updateStatus",id:r.id,...o});toast(ok?m:"Error de conexión",ok?"":"err")};
 $("#list").onclick=async e=>{const b=e.target.closest("[data-a]");if(!b||!/^[xroc]$/.test(b.dataset.a))return;const r=DB.find(x=>x.id===b.dataset.id),a=b.dataset.a;if(!r)return;
 if(a==="c")return dl(r);
@@ -365,18 +380,18 @@ up(r,{[k+"Estado"]:i.value,[k+"Resp"]:n},r.estado==="Completado"?"✓ Completado
 
 // ---- Alertas de corrección ----
 const ALERT_FORMS=G.flatMap(g=>g[1]);
-$("#alertFormChoices").innerHTML=ALERT_FORMS.map((f,i)=>`<label class="opt"><input type="checkbox" name="alertFm" value="${esc(f)}"><span>${esc(f)}</span></label>`).join("");
+$("#alertFormSelect").insertAdjacentHTML("beforeend",ALERT_FORMS.map(f=>`<option value="${esc(f)}">${esc(f)}</option>`).join(""));
 async function getJson(url){try{const r=await fetch(url+"&t="+Date.now());return await r.json()}catch(e){return null}}
 async function loadAlerts(){try{const d=await fetch(API+"?tipo=alertas&t="+Date.now()).then(r=>r.json());if(Array.isArray(d))ALERTS=d;renderAlerts()}catch(e){}}
-async function loadAlertPrefs(){try{const d=await fetch(API+"?tipo=preferencias&t="+Date.now()).then(r=>r.json());if(d&&typeof d==="object"){ALERT_PREFS=d;$("#draNotify").checked=!!d.enabled;$("#draEmail").value=d.email||"";$("#alertPrefs").hidden=false}}catch(e){}}
+
 function renderAlerts(){if(role!=="dra"&&role!=="asis")return;const host=$("#alertsList");if(!host)return;const list=ALERTS.slice().reverse();host.innerHTML=list.length?list.map(a=>`<div class="card alert-card ${a.estado==="Corregida"?"done":""}"><div class="row"><b class="exp">${esc(a.expediente)}</b><span class="sp"></span><span class="tag ${a.estado==="Corregida"?"lime":"co"}">${esc(a.estado)}</span></div><p class="mu s">Creada: ${esc(a.fecha)} · Por: <b>${esc(a.creador)}</b></p><p><b>Formulario:</b> ${esc(a.formularios)}</p><p><b>Pregunta por revisar:</b> ${esc(a.pregunta)}</p><p><b>Observaciones:</b> ${esc(a.observaciones)}</p>${a.respuesta?`<p><b>Respuesta de la Dra.:</b> ${esc(a.respuesta)}</p><p class="mu s">Corregida: ${esc(a.fechaResolucion||"")}</p>`:""}<div class="row" style="margin-top:10px">${role==="dra"&&a.estado!=="Corregida"?`<button class="ghost" data-alert-resolve="${esc(a.id)}">Marcar corregida</button>`:""}<span class="sp"></span><button class="ghost" data-alert-delete="${esc(a.id)}">Eliminar</button></div></div>`).join(""):'<div class="empty">Todavía no hay alertas de corrección.</div>';}
 $("#saveDraPrefs").onclick=async()=>{const email=$("#draEmail").value.trim().toLowerCase(),enabled=$("#draNotify").checked;if(enabled&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))return toast("Escriba un correo válido","err");await post({action:"setAlertPrefs",enabled,email});ALERT_PREFS={enabled,email};toast("Preferencias guardadas")};
 $("#cancelAlert").onclick=()=>{$("#alertForm").hidden=true};
-$("#alertForm").onsubmit=async e=>{e.preventDefault();const forms=[...document.querySelectorAll('[name="alertFm"]:checked')].map(x=>x.value),email=$("#aCreatorEmail").value.trim().toLowerCase();if(!forms.length)return toast("Seleccione al menos un formulario","err");if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))return toast("Escriba un correo válido para recibir la notificación","err");const data={action:"createAlert",id:"ALT-"+Date.now(),expediente:$("#aExp").value.trim().toUpperCase(),formularios:forms,pregunta:$("#aQuestion").value.trim(),observaciones:$("#aNotes").value.trim(),creador:$("#aCreator").value.trim(),email:email};if(!data.expediente||!data.pregunta||!data.observaciones||!data.creador)return toast("Complete todos los campos","err");const b=$("#sendAlert");b.disabled=true;b.textContent="Enviando…";await post(data);await new Promise(r=>setTimeout(r,800));await loadAlerts();const ok=ALERTS.some(a=>a.id===data.id);toast(ok?"Alerta enviada a la Dra. Lilliam":"No se pudo confirmar. Revise la conexión",ok?"":"err");if(ok){$("#alertForm").reset();$("#alertForm").hidden=true}b.disabled=false;b.textContent="Enviar alerta"};
+$("#alertForm").onsubmit=async e=>{e.preventDefault();const selected=$("#alertFormSelect").value,forms=selected?[selected]:[],email=$("#aCreatorEmail").value.trim().toLowerCase()||(role==="dra"?(localStorage.getItem("ms_dra_email")||$("#draEmail").value.trim().toLowerCase()):localStorage.getItem("ms_mail"))||"";if(!forms.length)return toast("Selecciona un formulario","err");if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))return toast("Escriba un correo válido para recibir la notificación","err");$("#aCreatorEmail").value=email;const data={action:"createAlert",id:"ALT-"+Date.now(),expediente:$("#aExp").value.trim().toUpperCase(),formularios:forms,pregunta:$("#aQuestion").value.trim(),observaciones:$("#aNotes").value.trim(),creador:$("#aCreator").value.trim(),email:email};if(!data.expediente||!data.pregunta||!data.observaciones||!data.creador)return toast("Complete todos los campos","err");const b=$("#sendAlert");b.disabled=true;b.textContent="Enviando…";await post(data);await new Promise(r=>setTimeout(r,800));await loadAlerts();const ok=ALERTS.some(a=>a.id===data.id);toast(ok?"Alerta enviada a la Dra. Lilliam":"No se pudo confirmar. Revise la conexión",ok?"":"err");if(ok){$("#alertForm").reset();$("#alertForm").hidden=true}b.disabled=false;b.textContent="Enviar alerta"};
 $("#alertsList").onclick=async e=>{const r=e.target.closest("[data-alert-resolve],[data-alert-delete]");if(!r)return;const id=r.dataset.alertResolve||r.dataset.alertDelete;if(r.dataset.alertResolve){const respuesta=prompt("Anote brevemente qué se corrigió (opcional):")||"La Dra. Lilliam marcó la alerta como corregida.";await post({action:"resolveAlert",id,respuesta});toast("Alerta marcada como corregida; se notificará al asistente")}else{if(!confirm("¿Eliminar esta alerta del historial? Esta acción no se puede deshacer."))return;await post({action:"deleteAlert",id});toast("Alerta eliminada del historial")}await new Promise(r=>setTimeout(r,500));await loadAlerts()};
 
 document.querySelectorAll("[data-ic]").forEach(e=>e.insertAdjacentHTML("afterbegin",ic(e.dataset.ic)));
-$("#bAlertPage").onclick=e=>{e.preventDefault();e.stopPropagation();$("#menu").hidden=true;if(role==="dra"){$("#vDra").hidden=true;$("#vAlertas").hidden=false;$("#alertForm").hidden=true;loadAlertPrefs()}else{tab="nueva";$("#alertForm").hidden=true;render()}loadAlerts()};
+$("#bAlertPage").onclick=e=>{e.preventDefault();e.stopPropagation();$("#menu").hidden=true;if(role==="dra"){draTab="alertas";applyDraTab();$("#alertForm").hidden=false}else{tab="nueva";sig="";render();$("#alertForm").hidden=false}loadAlerts()};
 $("#bBackDra").onclick=e=>{e.preventDefault();e.stopPropagation();$("#menu").hidden=true;$("#vAlertas").hidden=true;$("#vDra").hidden=false};
 $("#bMenu").onclick=e=>{e.stopPropagation();$("#menu").hidden=!$("#menu").hidden};
 addEventListener("click",()=>{$("#menu").hidden=true});
