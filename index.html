@@ -81,6 +81,10 @@ nav button b{transition:transform .25s}nav button.on b{transform:translateY(-2px
 .gb{padding:0 16px 14px;animation:up .25s both}
 .gc{font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--soft);color:var(--mu)}.gc.on{background:var(--li);color:#2a2a00}
 .chev{display:grid;color:var(--mu);transition:transform .25s}details[open] .chev{transform:rotate(180deg)}
+.tag.st-a{background:#2e9e5b;color:#fff}.tag.st-f{background:#f2b705;color:#2a2000}.tag.st-r{background:#d64545;color:#fff}
+.vd{margin-top:8px;border:1px solid var(--bd);border-radius:14px;padding:0 12px}
+.vd summary{display:flex;align-items:center;gap:8px;padding:10px 0;cursor:pointer;list-style:none}.vd summary::-webkit-details-marker{display:none}
+.vd .chips{margin-top:0;padding-bottom:10px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -120,8 +124,8 @@ nav button b{transition:transform .25s}nav button.on b{transform:translateY(-2px
   <div class="card" id="cfg" hidden>
     <b>Ajustes de avisos</b>
     <p class="mu">Recibe un correo cada vez que Lilliam registre un expediente nuevo.</p>
-    <div id="mailForm"><input type="text" id="mailIn" inputmode="email" autocapitalize="none" placeholder="tucorreo@ejemplo.com" style="margin-top:8px"><button class="btn" id="mailAdd" type="button" style="margin-top:10px">Activar avisos por correo</button></div>
-    <div id="mailOk" hidden><p>✓ Recibiendo avisos en <b id="mailTxt"></b></p><button class="ghost" id="mailDel" type="button">Dejar de recibir</button></div>
+    <div id="mailForm"><input type="text" id="mailIn" inputmode="email" autocapitalize="none" placeholder="tucorreo@ejemplo.com" style="margin-top:8px"><label class="opt"><input type="checkbox" id="calOpt"><span>Agregar las visitas a mi calendario</span></label><button class="btn" id="mailAdd" type="button" style="margin-top:10px">Activar avisos por correo</button></div>
+    <div id="mailOk" hidden><p>✓ Recibiendo avisos en <b id="mailTxt"></b></p><label class="opt" style="margin-bottom:10px"><input type="checkbox" id="calOpt2"><span>Agregar las visitas a mi calendario</span></label><button class="ghost" id="mailDel" type="button">Dejar de recibir</button></div>
   </div>
 
   <!-- VISTA LILLIAM -->
@@ -141,10 +145,16 @@ nav button b{transition:transform .25s}nav button.on b{transform:translateY(-2px
       </div>
       <div id="forms"></div>
       <div class="card">
+        <label class="f">Fecha de llegada de la participante (opcional)</label>
+        <input type="date" id="llegada" style="margin-bottom:12px">
         <label class="f">Próxima visita (opcional)</label>
         <input type="date" id="fecha" style="margin-bottom:12px">
         <label class="f">Notas (opcional)</label>
         <textarea id="notas" rows="2"></textarea>
+      </div>
+      <div class="card">
+        <label class="opt" style="margin:0"><input type="checkbox" id="cal"><span>Agregar estas fechas a los calendarios</span></label>
+        <div id="calBox" hidden><p class="mu">Se enviará una invitación a tu correo y al de los asistentes que lo hayan activado.</p><input type="text" id="calMail" inputmode="email" autocapitalize="none" placeholder="Tu correo para recibir el evento"></div>
       </div>
       <button class="btn" id="send">Enviar reporte</button>
     </form>
@@ -226,20 +236,23 @@ function view(){$("#bCfg").hidden=role!=="asis";if(role!=="asis")$("#cfg").hidde
 $("#who").textContent=role==="dra"?"Dra. Lilliam":"Equipo asistente";sig="";render();renderRecent()}
 
 // ---- Ajustes: avisos por correo ----
-function mailUI(){const m=localStorage.getItem("ms_mail");$("#mailForm").hidden=!!m;$("#mailOk").hidden=!m;$("#mailTxt").textContent=m||""}
+function mailUI(){const m=localStorage.getItem("ms_mail");$("#mailForm").hidden=!!m;$("#mailOk").hidden=!m;$("#mailTxt").textContent=m||"";$("#calOpt2").checked=localStorage.getItem("ms_cal")==="1"}
 $("#bCfg").onclick=()=>{$("#cfg").hidden=!$("#cfg").hidden;mailUI()};
 $("#mailAdd").onclick=async()=>{const m=$("#mailIn").value.trim().toLowerCase();
 if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m))return toast("Escribe un correo válido","err");
-if(await post({action:"subscribe",email:m})){localStorage.setItem("ms_mail",m);mailUI();toast("Listo. Te enviamos un correo de confirmación")}else toast("Error de conexión","err")};
+if(await post({action:"subscribe",email:m,calendar:$("#calOpt").checked})){localStorage.setItem("ms_mail",m);localStorage.setItem("ms_cal",$("#calOpt").checked?"1":"0");mailUI();toast("Listo. Te enviamos un correo de confirmación")}else toast("Error de conexión","err")};
 $("#mailDel").onclick=async()=>{const m=localStorage.getItem("ms_mail");
 if(await post({action:"unsubscribe",email:m})){localStorage.removeItem("ms_mail");mailUI();toast("Ya no recibirás correos")}else toast("Error de conexión","err")};
+
+$("#calOpt2").onchange=async()=>{const m=localStorage.getItem("ms_mail"),on=$("#calOpt2").checked;
+if(await post({action:"subscribe",email:m,calendar:on})){localStorage.setItem("ms_cal",on?"1":"0");toast(on?"Las visitas se agregarán a tu calendario":"Ya no se agregarán a tu calendario")}else{$("#calOpt2").checked=!on;toast("Error de conexión","err")}};
 
 // ---- Datos ----
 async function post(o){try{await fetch(API,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(o)});return true}catch(e){return false}}
 async function load(){let ok=true;
 try{const r=await fetch(API+"?t="+Date.now()),d=await r.json();if(!Array.isArray(d))throw 0;
 const prev=new Set(DB.map(x=>x.id));
-DB=d.map(w=>({id:w.ID,timestamp:w["Fecha Registro"],expediente:w.Expediente,esNuevo:w["Es Nuevo"]==="SÍ",estadoParticipante:w["Estado Participante"]||"Activo",fechaVisita:w["Fecha Visita"]||"",formularios:(w.Formularios||"").split(", ").filter(Boolean),notas:w.Notas||"",estado:w.Estado||"Pendiente"}));
+DB=d.map(w=>({id:w.ID,timestamp:w["Fecha Registro"],expediente:w.Expediente,esNuevo:w["Es Nuevo"]==="SÍ",estadoParticipante:w["Estado Participante"]||"Activo",fechaVisita:w["Fecha Visita"]||"",fechaLlegada:w["Fecha Llegada"]||"",formularios:(w.Formularios||"").split(", ").filter(Boolean),notas:w.Notas||"",estado:w.Estado||"Pendiente"}));
 const n=DB.filter(r=>r.estado==="Pendiente"&&!prev.has(r.id)).length;
 if(loaded&&n&&role==="asis")notify(n);loaded=true}catch(e){ok=false}
 $("#dot").className="dot"+(ok?"":" off");render();renderRecent()}
@@ -248,21 +261,31 @@ $("#dot").className="dot"+(ok?"":" off");render();renderRecent()}
 $("#forms").innerHTML=G.map((g,i)=>`<details class="card grp"><summary><b>${g[0]}</b><span class="gc" id="gc${i}">0/${g[1].length}</span><span class="sp"></span><button type="button" class="ghost" data-all="${i}">Seleccionar todo</button><span class="chev">${ic("chev")}</span></summary><div class="gb">${g[1].map(f=>`<label class="opt"><input type="checkbox" name="fm" data-g="${i}" value="${f}"><span>${f}</span></label>`).join("")}</div></details>`).join("");
 function cnt(){G.forEach((g,i)=>{const n=document.querySelectorAll(`[data-g="${i}"]:checked`).length,e=$("#gc"+i);e.textContent=n+"/"+g[1].length;e.classList.toggle("on",n>0)})}
 $("#forms").onclick=e=>{const i=e.target.dataset.all;if(i==null)return;e.preventDefault();const c=[...document.querySelectorAll(`[data-g="${i}"]`)],on=c.some(x=>!x.checked);c.forEach(x=>x.checked=on);cnt()};
-$("#forms").onchange=cnt;$("#fDra").addEventListener("reset",()=>setTimeout(cnt));
+$("#forms").onchange=cnt;$("#fDra").addEventListener("reset",()=>setTimeout(()=>{cnt();$("#calBox").hidden=true;$("#calMail").value=localStorage.getItem("ms_dmail")||""}));
+$("#cal").onchange=()=>{$("#calBox").hidden=!$("#cal").checked};$("#calMail").value=localStorage.getItem("ms_dmail")||"";
 document.querySelectorAll("[name=est]").forEach(r=>r.onchange=()=>{$("#forms").hidden=document.querySelector("[name=est]:checked").value!=="Activo"});
 $("#fDra").onsubmit=async e=>{e.preventDefault();const est=document.querySelector("[name=est]:checked").value,act=est==="Activo";
 const fm=act?[...document.querySelectorAll("[name=fm]:checked")].map(x=>x.value):["[Cambio de Estado: "+est+"]"];
 if(!fm.length)return toast("Selecciona al menos un formulario","err");
 const ex=$("#exp").value.trim().toUpperCase();if(DB.some(r=>r.expediente===ex&&r.estado==="Pendiente")&&!confirm("Ya hay un reporte pendiente del expediente "+ex+". ¿Enviar otro de todos modos?"))return;
+const cal=$("#cal").checked,cm=$("#calMail").value.trim().toLowerCase();
+if(cal){if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(cm))return toast("Escribe tu correo para recibir el evento","err");
+if(!$("#llegada").value&&!(act&&$("#fecha").value))return toast("Elige al menos una fecha para el calendario","err");localStorage.setItem("ms_dmail",cm)}
 const d=new Date(),z=n=>String(n).padStart(2,"0");
 const rec={action:"add",id:"REG-"+Date.now(),timestamp:`${z(d.getDate())}/${z(d.getMonth()+1)}/${d.getFullYear()} ${z(d.getHours())}:${z(d.getMinutes())}:${z(d.getSeconds())}`,
-expediente:$("#exp").value.trim().toUpperCase(),esNuevo:$("#nuevo").checked,estadoParticipante:est,fechaVisita:act?$("#fecha").value:"",formularios:fm,notas:$("#notas").value.trim(),estado:"Pendiente",usuario:"Dra"};
+expediente:$("#exp").value.trim().toUpperCase(),esNuevo:$("#nuevo").checked,estadoParticipante:est,fechaVisita:act?$("#fecha").value:"",formularios:fm,notas:$("#notas").value.trim(),estado:"Pendiente",usuario:"Dra",fechaLlegada:$("#llegada").value,calendar:cal,calEmail:cm};
 const b=$("#send");b.disabled=true;b.textContent="Enviando…";
 await post(rec);await load();
 const ok=DB.some(r=>r.id===rec.id);
 toast(ok?"✓ Reporte enviado y confirmado en la hoja":"No se pudo confirmar el envío. Revisa la conexión e inténtalo de nuevo",ok?"":"err");
 if(ok){$("#fDra").reset();$("#forms").hidden=false;$("#exp").focus()}b.disabled=false;b.textContent="Enviar reporte"};
 
+function ec(e){return e==="Activo"?"st-a":e==="Finalizó"?"st-f":"st-r"}
+function forms(r){const used=new Set();let h="";
+G.forEach(g=>{const m=g[1].filter(f=>r.formularios.includes(f));if(!m.length)return;m.forEach(f=>used.add(f));
+h+=`<details class="vd"${tab==="alertas"?" open":""}><summary><b>${g[0]}</b><span class="gc on">${m.length}</span><span class="sp"></span><span class="chev">${ic("chev")}</span></summary><div class="chips">${m.map(f=>`<span class="chip">${esc(f)}</span>`).join("")}</div></details>`});
+const o=r.formularios.filter(f=>!used.has(f));
+if(o.length)h+=`<div class="chips">${o.map(f=>`<span class="chip">${esc(f)}</span>`).join("")}</div>`;return h}
 function renderRecent(){if(role!=="dra")return;const it=DB.slice(-5).reverse();
 $("#recent").innerHTML=it.length?it.map(r=>`<div class="card"><div class="row"><b>${esc(r.expediente)}</b><span class="sp"></span><span class="tag ${r.estado==="Pendiente"?"co":""}">${r.estado==="Pendiente"?"Pendiente":"✓ "+esc(r.estado)}</span></div><p class="mu s">${esc(r.timestamp)}</p></div>`).join(""):'<div class="empty">Aún no hay envíos</div>'}
 function dtag(f){const t=new Date();t.setHours(0,0,0,0);const n=Math.round((new Date(f+"T00:00:00")-t)/864e5);return n<0?'<span class="tag co">Vencida</span>':n===0?'<span class="tag lime">Hoy</span>':n===1?'<span class="tag">Mañana</span>':""}
@@ -277,9 +300,9 @@ $("#stats").innerHTML=`<button data-tab="alertas"><b>${pend}</b><span>Pendientes
 let it=DB.slice().reverse().filter(r=>!q||(r.expediente+" "+r.formularios.join(" ")).toLowerCase().includes(q));
 it=tab==="alertas"?it.filter(r=>r.estado==="Pendiente"):tab==="visitas"?it.filter(r=>r.fechaVisita).sort((a,b)=>a.fechaVisita.localeCompare(b.fechaVisita)):it.filter(r=>r.estado!=="Pendiente");
 $("#list").innerHTML=it.length?it.map(r=>`<div class="card ${r.esNuevo&&r.estado==="Pendiente"?"nw":""}">
-<div class="row"><b class="exp">${esc(r.expediente)}</b>${r.esNuevo?'<span class="tag lime">NUEVA</span>':""}<span class="tag">${esc(r.estadoParticipante)}</span></div>
-<div class="chips">${r.formularios.map(f=>`<span class="chip">${esc(f)}</span>`).join("")}</div>
-${r.fechaVisita?`<div class="vis">📅 <input type="date" value="${esc(r.fechaVisita)}" data-a="d" data-id="${esc(r.id)}">${dtag(r.fechaVisita)}<button class="ghost" data-a="x" data-id="${esc(r.id)}">Quitar</button></div>`:""}${r.notas?`<p class="mu">📝 ${esc(r.notas)}</p>`:""}
+<div class="row"><b class="exp">${esc(r.expediente)}</b>${r.esNuevo?'<span class="tag lime">NUEVA</span>':""}<span class="tag ${ec(r.estadoParticipante)}">${esc(r.estadoParticipante)}</span></div>
+${forms(r)}
+${r.fechaVisita?`<div class="vis">📅 <input type="date" value="${esc(r.fechaVisita)}" data-a="d" data-id="${esc(r.id)}">${dtag(r.fechaVisita)}<button class="ghost" data-a="x" data-id="${esc(r.id)}">Quitar</button></div>`:""}${r.fechaLlegada?`<p class="mu">Llegada: ${esc(r.fechaLlegada)}</p>`:""}${r.notas?`<p class="mu">📝 ${esc(r.notas)}</p>`:""}
 <p class="mu s">${esc(r.timestamp)} · ${ago(r.timestamp)} · ${esc(r.estado)}</p>
 ${r.estado==="Pendiente"?`<input type="text" id="n-${esc(r.id)}" placeholder="Nota (opcional)" style="margin-top:10px"><div class="acts">${ASIST.map(n=>`<button data-a="p" data-id="${esc(r.id)}" data-n="${n}">${n}</button>`).join("")}</div>`
 :`<div style="margin-top:10px"><button class="ghost" data-a="r" data-id="${esc(r.id)}">Regresar a pendiente</button></div>`}</div>`).join("")
