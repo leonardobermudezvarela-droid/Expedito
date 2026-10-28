@@ -87,6 +87,8 @@ nav button b{transition:transform .25s}nav button.on b{transform:translateY(-2px
 .vd .chips{margin-top:0;padding-bottom:10px}
 select{width:100%;padding:10px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}input[type=time]{padding:13px 10px;border-radius:14px;border:1px solid var(--bd);background:var(--bg);outline:none}.trk{display:grid;grid-template-columns:78px 1fr 1fr;gap:6px;align-items:center;margin-top:8px}.trk b{font-size:12px}.trk input{padding:10px}a.ghost{text-decoration:none;display:inline-block}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.alert-form{display:grid;gap:12px}.alert-form textarea{min-height:82px}.alert-card{border-left:4px solid var(--co)}.alert-card.done{border-left-color:#2e9e5b}.fabplus{font-size:23px!important;font-weight:800!important;background:var(--pr)!important;color:white!important;min-width:48px;max-width:54px;flex:1.1!important}
 </style>
 </head>
 <body>
@@ -115,6 +117,8 @@ select{width:100%;padding:10px;border-radius:12px;border:1px solid var(--bd);bac
     <div id="menu" hidden>
       <a class="mi" id="bSheet" href="#" target="_blank" rel="noopener" hidden><span data-ic="sheet"></span>Ver Excel en Drive</a>
       <button class="mi" id="bCfg" hidden><span data-ic="sliders"></span>Ajustes de avisos</button>
+      <button class="mi" id="bAlertPage"><span data-ic="bell"></span>Alertas de corrección</button>
+      <button class="mi" id="bBackDra" hidden>Volver a registrar reportes</button>
       <button class="mi" id="bInst" hidden><span data-ic="down"></span>Instalar app</button>
       <button class="mi" id="bSwitch"><span data-ic="swap"></span>Cambiar vista</button>
       <button class="mi" id="bOut"><span data-ic="out"></span>Salir</button>
@@ -165,12 +169,36 @@ select{width:100%;padding:10px;border-radius:12px;border:1px solid var(--bd);bac
   <!-- VISTA ASISTENTES -->
   <section id="vAsis" hidden>
     <div class="stats" id="stats"></div>
-    <input type="text" id="me" placeholder="✍️ Tu nombre (quien trabaja en los expedientes)" style="margin-bottom:8px"><input type="search" id="q" placeholder="🔍 Buscar expediente o formulario" style="margin-bottom:12px">
+    <input type="search" id="q" placeholder="🔍 Buscar expediente o formulario" style="margin-bottom:12px">
     <div id="list"></div>
+  </section>
+  <section id="vAlertas" hidden>
+    <div class="card hero"><h2>Alertas de corrección</h2><p>Solicitudes para revisar formularios o preguntas de un expediente.</p></div>
+    <div id="alertPrefs" class="card" hidden>
+      <b>Notificaciones de la Dra. Lilliam</b>
+      <p class="mu">Active esta opción para recibir correos cuando un asistente deje una observación o cree una alerta.</p>
+      <label class="opt"><input type="checkbox" id="draNotify"><span>Recibir correos de observaciones y alertas</span></label>
+      <label class="f" style="margin-top:12px">Correo de la Dra. Lilliam</label>
+      <input type="text" id="draEmail" inputmode="email" placeholder="correo@ucr.ac.cr">
+      <button class="btn" id="saveDraPrefs" type="button" style="margin-top:10px">Guardar preferencias</button>
+    </div>
+    <form id="alertForm" class="card alert-form" hidden>
+      <h3 style="margin:0">Crear alerta para la Dra. Lilliam</h3>
+      <label class="f">Código del expediente</label><input id="aExp" type="text" placeholder="Ej. CRM01" required autocapitalize="characters">
+      <label class="f">Formulario que se debe corregir</label><div id="alertFormChoices"></div>
+      <label class="f">Pregunta que debe revisar la Dra.</label><textarea id="aQuestion" placeholder="Indique la pregunta o el apartado que requiere revisión" required></textarea>
+      <label class="f">Observaciones del asistente</label><textarea id="aNotes" placeholder="Explique qué debe corregirse o qué duda tiene" required></textarea>
+      <label class="f">Nombre de quien crea la alerta</label><input id="aCreator" type="text" placeholder="Nombre y apellido" required>
+      <label class="f">Correo para recibir aviso cuando se corrija</label><input id="aCreatorEmail" type="text" inputmode="email" placeholder="tu.correo@ucr.ac.cr" required>
+      <button class="btn" id="sendAlert" type="submit">Enviar alerta</button>
+      <button class="ghost" id="cancelAlert" type="button">Cancelar</button>
+    </form>
+    <h3 style="margin:18px 0 10px">Historial de alertas</h3><div id="alertsList"></div>
   </section>
 </div>
 <nav id="nav" hidden>
   <button data-tab="alertas"><b data-ic="bell"></b>Alertas <span id="cnt"></span></button>
+  <button data-tab="nueva"><b>＋</b>Nueva</button>
   <button data-tab="visitas"><b data-ic="cal"></b>Visitas</button>
   <button data-tab="historial"><b data-ic="check"></b>Historial</button>
 </nav>
@@ -188,7 +216,7 @@ const G=[["1ª visita",["Cuestionario #1 (1visita)","Antropometría y bioimpedan
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-let role=localStorage.getItem("ms_role"),DB=[],tab="alertas",loaded=false,sig="",timer=null;
+let role=localStorage.getItem("ms_role"),DB=[],ALERTS=[],ALERT_PREFS={enabled:false,email:""},tab="alertas",loaded=false,sig="",timer=null;
 
 function toast(m,t){const d=document.createElement("div");if(t==="err")d.className="err";d.textContent=m;$("#toast").appendChild(d);setTimeout(()=>d.remove(),4000)}
 
@@ -233,8 +261,8 @@ if(p==="bdalerta"&&(u==="lilliam"||u==="asistente")){role=u==="lilliam"?"dra":"a
 $("#bOut").onclick=()=>{localStorage.removeItem("ms_role");location.reload()};
 $("#bSwitch").onclick=()=>{role=role==="dra"?"asis":"dra";localStorage.setItem("ms_role",role);view()};
 function start(){$("#login").hidden=true;$("#app").hidden=false;bell();view();load();if(!timer)timer=setInterval(load,30000)}
-function view(){$("#bCfg").hidden=role!=="asis";if(role!=="asis")$("#cfg").hidden=true;$("#bSheet").hidden=role!=="asis";$("#bSheet").href=SHEET;$("#vDra").hidden=role!=="dra";$("#vAsis").hidden=role!=="asis";$("#nav").hidden=role!=="asis";
-$("#who").textContent=role==="dra"?"Dra. Lilliam":"Equipo asistente";sig="";render();renderRecent()}
+function view(){$("#bCfg").hidden=role!=="asis";if(role!=="asis")$("#cfg").hidden=true;$("#bSheet").hidden=role!=="asis";$("#bSheet").href=SHEET;$("#vDra").hidden=role!=="dra";$("#vAsis").hidden=role!=="asis";$("#vAlertas").hidden=true;$("#bBackDra").hidden=role!=="dra";$("#nav").hidden=role!=="asis";
+$("#who").textContent=role==="dra"?"Dra. Lilliam":"Equipo asistente";sig="";render();renderRecent();loadAlerts();if(role==="dra")loadAlertPrefs()}
 
 // ---- Ajustes: avisos por correo ----
 function mailUI(){const m=localStorage.getItem("ms_mail");$("#mailForm").hidden=!!m;$("#mailOk").hidden=!m;$("#mailTxt").textContent=m||"";$("#calOpt2").checked=localStorage.getItem("ms_cal")==="1"}
@@ -256,7 +284,7 @@ const prev=new Set(DB.map(x=>x.id));
 DB=d.map(w=>({id:w.ID,timestamp:w["Fecha Registro"],expediente:w.Expediente,esNuevo:w["Es Nuevo"]==="SÍ",estadoParticipante:w["Estado Participante"]||"Activo",fechaVisita:w["Fecha Visita"]||"",fechaLlegada:w["Fecha Llegada"]||"",formularios:(w.Formularios||"").split(", ").filter(Boolean),notas:w.Notas||"",estado:w.Estado||"Pendiente",horaVisita:w["Hora Visita"]||"",completos:w["Formularios Completos"]!=="NO",bdE:w["BD Estado"]||"Sin iniciar",bdR:w["BD Responsable"]||"",rcE:w["RedCap Estado"]||"Sin iniciar",rcR:w["RedCap Responsable"]||"",obs:String(w.Observaciones||"").split("\n").filter(Boolean)}));
 const n=DB.filter(r=>r.estado==="Pendiente"&&!prev.has(r.id)).length;
 if(loaded&&n&&role==="asis")notify(n);loaded=true}catch(e){ok=false}
-$("#dot").className="dot"+(ok?"":" off");render();renderRecent()}
+$("#dot").className="dot"+(ok?"":" off");render();renderRecent();loadAlerts()}
 
 // ---- Vista Lilliam ----
 $("#forms").innerHTML=G.map((g,i)=>`<details class="card grp"><summary><b>${g[0]}</b><span class="gc" id="gc${i}">0/${g[1].length}</span><span class="sp"></span><button type="button" class="ghost" data-all="${i}">Seleccionar todo</button><span class="chev">${ic("chev")}</span></summary><div class="gb">${g[1].map(f=>`<label class="opt"><input type="checkbox" name="fm" data-g="${i}" value="${f}"><span>${f}</span></label>`).join("")}</div></details>`).join("");
@@ -301,6 +329,8 @@ function dtag(f){const t=new Date();t.setHours(0,0,0,0);const n=Math.round((new 
 function ago(t){const m=String(t).match(/(\d+)\/(\d+)\/(\d+) (\d+):(\d+)/);if(!m)return"";const d=Math.round((Date.now()-new Date(m[3],m[2]-1,m[1],m[4],m[5]))/6e4);return d<1?"ahora":d<60?`hace ${d} min`:d<1440?`hace ${Math.floor(d/60)} h`:`hace ${Math.floor(d/1440)} d`}
 // ---- Vista asistentes ----
 function render(){if(role!=="asis")return;
+$("#vAlertas").hidden=tab!=="nueva";$("#vAsis").hidden=tab==="nueva";
+if(tab==="nueva"){renderAlerts();return}
 const pend=DB.filter(r=>r.estado==="Pendiente").length;$("#cnt").textContent=pend?`(${pend})`:"";document.title=(pend?`(${pend}) `:"")+"Expedito";
 const q=$("#q").value.toLowerCase().trim(),s=JSON.stringify(DB)+tab+q;if(s===sig)return;if(document.activeElement?.matches("#list input,#list select"))return;sig=s;
 document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
@@ -315,24 +345,39 @@ ${r.fechaVisita?`<div class="vis">📅 <input type="date" value="${esc(r.fechaVi
 <p class="mu s">${esc(r.timestamp)} · ${ago(r.timestamp)} · ${esc(r.estado)}</p>
 ${chk(r)}${trk(r,r.estado==="Pendiente")}${obsH(r)}${r.estado==="Pendiente"?`<div class="row" style="margin-top:10px;flex-wrap:nowrap"><input type="text" id="o-${esc(r.id)}" placeholder="Observación de datos faltantes (opcional)"><button class="ghost" data-a="o" data-id="${esc(r.id)}">Enviar a la Dra.</button></div>`:`<div style="margin-top:10px"><button class="ghost" data-a="r" data-id="${esc(r.id)}">Regresar a pendiente</button></div>`}</div>`).join("")
 :`<div class="empty">${tab==="alertas"?"🎉 No hay alertas pendientes":"Nada por aquí"}</div>`}
-$("#me").value=localStorage.getItem("ms_nombre")||"";$("#me").oninput=()=>localStorage.setItem("ms_nombre",$("#me").value.trim());$("#q").oninput=render;$("#stats").onclick=e=>{const t=e.target.closest("button")?.dataset.tab;if(t){tab=t;render()}};
-$("#nav").onclick=e=>{const t=e.target.closest("button")?.dataset.tab;if(t){tab=t;render()}};
+$("#q").oninput=render;$("#stats").onclick=e=>{const t=e.target.closest("button")?.dataset.tab;if(t){tab=t;render()}};
+$("#nav").onclick=e=>{const t=e.target.closest("button")?.dataset.tab;if(t){tab=t;if(t==="nueva"){$("#alertForm").hidden=false;$("#alertForm").scrollIntoView({behavior:"smooth",block:"start"})}else $("#alertForm").hidden=true;render();loadAlerts()}};
 const up=async(r,o,m)=>{sig="";render();const ok=await post({action:"updateStatus",id:r.id,...o});toast(ok?m:"Error de conexión",ok?"":"err")};
 $("#list").onclick=async e=>{const b=e.target.closest("[data-a]");if(!b||!/^[xroc]$/.test(b.dataset.a))return;const r=DB.find(x=>x.id===b.dataset.id),a=b.dataset.a;if(!r)return;
 if(a==="c")return dl(r);
 if(a==="x"){r.fechaVisita=r.horaVisita="";return up(r,{fechaVisita:"",horaVisita:""},"Fecha eliminada")}
 if(a==="r"){r.estado="Pendiente";r.bdE=r.rcE="En proceso";return up(r,{statusValue:"Pendiente",bdEstado:"En proceso",rcEstado:"En proceso"},"Regresado a pendientes")}
-const i=document.getElementById("o-"+r.id),t=i.value.trim(),n=$("#me").value.trim();if(!t)return toast("Escribe la observación","err");if(!n)return toast("Escribe tu nombre arriba","err");
-r.obs.push("[ahora] "+n+": "+t);i.value="";sig="";render();const ok=await post({action:"addObs",id:r.id,texto:t,autor:n});toast(ok?"Observación enviada a la Dra.":"Error de conexión",ok?"":"err")};
+const i=document.getElementById("o-"+r.id),t=i.value.trim();if(!t)return toast("Escribe la observación","err");
+const autor="Asistente";r.obs.push("[ahora] "+autor+": "+t);i.value="";sig="";render();const ok=await post({action:"addObs",id:r.id,texto:t,autor:autor});toast(ok?"Observación enviada a la Dra.":"Error de conexión",ok?"":"err")};
 $("#list").onchange=async e=>{const i=e.target,a=i.dataset.a,r=DB.find(x=>x.id===i.dataset.id);if(!r||!a)return;
 if(a==="d"){if(!i.value)return;r.fechaVisita=i.value;i.blur();return up(r,{fechaVisita:i.value},"Fecha actualizada")}
 if(a==="t"){r.horaVisita=i.value;i.blur();return up(r,{horaVisita:i.value},i.value?"Hora actualizada":"Hora quitada")}
 const k=i.dataset.k;
 if(a==="w"){r[k+"R"]=i.value.trim();return up(r,{[k+"Resp"]:r[k+"R"]},"Responsable guardado")}
-if(a==="s"){const n=r[k+"R"]||$("#me").value.trim();if(i.value!=="Sin iniciar"&&!n){i.value=r[k+"E"];return toast("Escribe quién lo está haciendo (tu nombre arriba o en el campo)","err")}
+if(a==="s"){const n=r[k+"R"]||"Equipo asistente";
 r[k+"E"]=i.value;r[k+"R"]=n;if(r.bdE==="Finalizado"&&r.rcE==="Finalizado")r.estado="Completado";i.blur();
 up(r,{[k+"Estado"]:i.value,[k+"Resp"]:n},r.estado==="Completado"?"✓ Completado en Base de datos y RedCap":"Estado actualizado")}};
+
+// ---- Alertas de corrección ----
+const ALERT_FORMS=G.flatMap(g=>g[1]);
+$("#alertFormChoices").innerHTML=ALERT_FORMS.map((f,i)=>`<label class="opt"><input type="checkbox" name="alertFm" value="${esc(f)}"><span>${esc(f)}</span></label>`).join("");
+async function getJson(url){try{const r=await fetch(url+"&t="+Date.now());return await r.json()}catch(e){return null}}
+async function loadAlerts(){try{const d=await fetch(API+"?tipo=alertas&t="+Date.now()).then(r=>r.json());if(Array.isArray(d))ALERTS=d;renderAlerts()}catch(e){}}
+async function loadAlertPrefs(){try{const d=await fetch(API+"?tipo=preferencias&t="+Date.now()).then(r=>r.json());if(d&&typeof d==="object"){ALERT_PREFS=d;$("#draNotify").checked=!!d.enabled;$("#draEmail").value=d.email||"";$("#alertPrefs").hidden=false}}catch(e){}}
+function renderAlerts(){if(role!=="dra"&&role!=="asis")return;const host=$("#alertsList");if(!host)return;const list=ALERTS.slice().reverse();host.innerHTML=list.length?list.map(a=>`<div class="card alert-card ${a.estado==="Corregida"?"done":""}"><div class="row"><b class="exp">${esc(a.expediente)}</b><span class="sp"></span><span class="tag ${a.estado==="Corregida"?"lime":"co"}">${esc(a.estado)}</span></div><p class="mu s">Creada: ${esc(a.fecha)} · Por: <b>${esc(a.creador)}</b></p><p><b>Formulario:</b> ${esc(a.formularios)}</p><p><b>Pregunta por revisar:</b> ${esc(a.pregunta)}</p><p><b>Observaciones:</b> ${esc(a.observaciones)}</p>${a.respuesta?`<p><b>Respuesta de la Dra.:</b> ${esc(a.respuesta)}</p><p class="mu s">Corregida: ${esc(a.fechaResolucion||"")}</p>`:""}<div class="row" style="margin-top:10px">${role==="dra"&&a.estado!=="Corregida"?`<button class="ghost" data-alert-resolve="${esc(a.id)}">Marcar corregida</button>`:""}<span class="sp"></span><button class="ghost" data-alert-delete="${esc(a.id)}">Eliminar</button></div></div>`).join(""):'<div class="empty">Todavía no hay alertas de corrección.</div>';}
+$("#saveDraPrefs").onclick=async()=>{const email=$("#draEmail").value.trim().toLowerCase(),enabled=$("#draNotify").checked;if(enabled&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))return toast("Escriba un correo válido","err");await post({action:"setAlertPrefs",enabled,email});ALERT_PREFS={enabled,email};toast("Preferencias guardadas")};
+$("#cancelAlert").onclick=()=>{$("#alertForm").hidden=true};
+$("#alertForm").onsubmit=async e=>{e.preventDefault();const forms=[...document.querySelectorAll('[name="alertFm"]:checked')].map(x=>x.value),email=$("#aCreatorEmail").value.trim().toLowerCase();if(!forms.length)return toast("Seleccione al menos un formulario","err");if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))return toast("Escriba un correo válido para recibir la notificación","err");const data={action:"createAlert",id:"ALT-"+Date.now(),expediente:$("#aExp").value.trim().toUpperCase(),formularios:forms,pregunta:$("#aQuestion").value.trim(),observaciones:$("#aNotes").value.trim(),creador:$("#aCreator").value.trim(),email:email};if(!data.expediente||!data.pregunta||!data.observaciones||!data.creador)return toast("Complete todos los campos","err");const b=$("#sendAlert");b.disabled=true;b.textContent="Enviando…";await post(data);await new Promise(r=>setTimeout(r,800));await loadAlerts();const ok=ALERTS.some(a=>a.id===data.id);toast(ok?"Alerta enviada a la Dra. Lilliam":"No se pudo confirmar. Revise la conexión",ok?"":"err");if(ok){$("#alertForm").reset();$("#alertForm").hidden=true}b.disabled=false;b.textContent="Enviar alerta"};
+$("#alertsList").onclick=async e=>{const r=e.target.closest("[data-alert-resolve],[data-alert-delete]");if(!r)return;const id=r.dataset.alertResolve||r.dataset.alertDelete;if(r.dataset.alertResolve){const respuesta=prompt("Anote brevemente qué se corrigió (opcional):")||"La Dra. Lilliam marcó la alerta como corregida.";await post({action:"resolveAlert",id,respuesta});toast("Alerta marcada como corregida; se notificará al asistente")}else{if(!confirm("¿Eliminar esta alerta del historial? Esta acción no se puede deshacer."))return;await post({action:"deleteAlert",id});toast("Alerta eliminada del historial")}await new Promise(r=>setTimeout(r,500));await loadAlerts()};
+
 document.querySelectorAll("[data-ic]").forEach(e=>e.insertAdjacentHTML("afterbegin",ic(e.dataset.ic)));
+$("#bAlertPage").onclick=e=>{e.preventDefault();e.stopPropagation();$("#menu").hidden=true;if(role==="dra"){$("#vDra").hidden=true;$("#vAlertas").hidden=false;$("#alertForm").hidden=true;loadAlertPrefs()}else{tab="nueva";$("#alertForm").hidden=true;render()}loadAlerts()};
+$("#bBackDra").onclick=e=>{e.preventDefault();e.stopPropagation();$("#menu").hidden=true;$("#vAlertas").hidden=true;$("#vDra").hidden=false};
 $("#bMenu").onclick=e=>{e.stopPropagation();$("#menu").hidden=!$("#menu").hidden};
 addEventListener("click",()=>{$("#menu").hidden=true});
 if(role)start();
