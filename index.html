@@ -104,6 +104,17 @@ nav button.on{background:linear-gradient(135deg,#92228c26,#a93e7e1f)}
 nav button.on::after{content:"";position:absolute;bottom:3px;width:16px;height:3px;border-radius:3px;background:var(--pr);animation:pop .25s}
 .chip{transition:transform .2s}.chip:hover{transform:translateY(-1px)}
 #toast div{backdrop-filter:blur(10px);border-radius:16px}
+.af{background:var(--bg);box-shadow:none!important;margin:0 0 8px}.alert-form{max-width:680px}
+@media (min-width:820px){
+.wrap{max-width:1060px;padding-left:112px;padding-right:28px}
+nav{left:22px;top:50%;bottom:auto;transform:translateY(-50%);width:78px;flex-direction:column;border-radius:30px}
+nav button{padding:12px 2px}
+#fDra{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}#fDra>.card{margin:0}#fDra>.btn,#forms{grid-column:1/-1}
+#forms{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}#forms .card{margin:0}
+#list,#alertsList,#recent{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;align-items:start}#list .card,#alertsList .card,#recent .card{margin:0}
+.stats{max-width:520px}#list .empty{grid-column:1/-1}
+}
+@media (min-width:1200px){.wrap{max-width:1280px}#list,#alertsList{grid-template-columns:repeat(3,1fr)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 .alert-form{display:grid;gap:12px}.alert-form textarea{min-height:82px}.alert-card{border-left:4px solid var(--co)}.alert-card.done{border-left-color:#2e9e5b}.fabplus{font-size:23px!important;font-weight:800!important;background:var(--pr)!important;color:white!important;min-width:48px;max-width:54px;flex:1.1!important}
@@ -206,12 +217,12 @@ nav button{min-height:58px}nav button.on{box-shadow:0 2px 8px #92228c12}
     <div id="list"></div>
   </section>
   <section id="vAlertas" hidden>
-    <div class="card hero"><h2>Alertas de corrección</h2><p>Solicitudes para revisar formularios o preguntas de un expediente.</p></div>
+    <div class="card hero"><h2 id="alH">Alertas de corrección</h2><p id="alP">Solicitudes para revisar formularios o preguntas de un expediente.</p></div>
 
     <form id="alertForm" class="card alert-form" hidden>
       <h3 style="margin:0">Crear alerta para la Dra. Lilliam</h3>
       <label class="f">Código del expediente</label><input id="aExp" type="text" placeholder="Ej. CRM01" required autocapitalize="characters">
-      <label class="f">Formulario que se debe corregir</label><div class="form-select"><select id="alertFormSelect" required><option value="">Selecciona un formulario…</option></select></div>
+      <label class="f">Formularios que se deben corregir</label><div id="alertForms"></div>
       <label class="f">Pregunta que debe revisar la Dra.</label><textarea id="aQuestion" placeholder="Indique la pregunta o el apartado que requiere revisión" required></textarea>
       <label class="f">Observaciones del asistente</label><textarea id="aNotes" placeholder="Explique qué debe corregirse o qué duda tiene" required></textarea>
       <label class="f">Nombre de quien crea la alerta</label><input id="aCreator" type="text" placeholder="Nombre y apellido" required>
@@ -219,7 +230,7 @@ nav button{min-height:58px}nav button.on{box-shadow:0 2px 8px #92228c12}
       <button class="btn" id="sendAlert" type="submit">Enviar alerta</button>
       <button class="ghost" id="cancelAlert" type="button">Cancelar</button>
     </form>
-    <h3 style="margin:18px 0 10px">Historial de alertas</h3><div id="alertsList"></div>
+    <h3 id="alT" style="margin:18px 0 10px">Historial de alertas</h3><div id="alertsList"></div>
   </section>
 </div>
 <nav id="nav" hidden>
@@ -294,8 +305,8 @@ $("#bSwitch").onclick=()=>{role=role==="dra"?"asis":"dra";localStorage.setItem("
 function start(){$("#login").hidden=true;$("#app").hidden=false;bell();view();load();if(!timer)timer=setInterval(load,30000)}
 function view(){$("#bCfg").hidden=true;$("#bSheet").hidden=role!=="asis";$("#bSheet").href=SHEET;$("#vDra").hidden=role!=="dra";$("#vAsis").hidden=role!=="asis";$("#vAlertas").hidden=true;$("#navDra").hidden=role!=="dra";$("#nav").hidden=role!=="asis";$("#assistantNotifySettings").hidden=role!=="asis";$("#draNotifySettings").hidden=role!=="dra";
 $("#who").textContent=role==="dra"?"Dra. Lilliam":"Equipo asistente";sig="";render();renderRecent();loadAlerts();if(role==="dra"){loadAlertPrefs();applyDraTab()}} 
-function applyDraTab(){if(role!=="dra")return;document.querySelectorAll("[data-dratab]").forEach(b=>b.classList.toggle("on",b.dataset.dratab===draTab));$("#vDra").hidden=draTab!=="reportes";$("#vAlertas").hidden=draTab==="reportes";$("#alertForm").hidden=true;const h=$("#vAlertas").querySelector("h3");if(h)h.textContent=draTab==="historial"?"Historial de alertas":"Alertas de corrección";if(draTab==="historial"){$("#alertForm").hidden=true;$("#vAlertas").scrollIntoView({behavior:"smooth",block:"start"})}}
-document.querySelectorAll("[data-dratab]").forEach(b=>b.onclick=()=>{draTab=b.dataset.dratab;applyDraTab();loadAlerts()});
+function applyDraTab(){if(role!=="dra")return;document.querySelectorAll("[data-dratab]").forEach(b=>b.classList.toggle("on",b.dataset.dratab===draTab));$("#vDra").hidden=draTab!=="reportes";$("#vAlertas").hidden=draTab==="reportes";$("#alertForm").hidden=true;const T={alertas:["Alertas de corrección","Solicitudes de los asistentes por atender.","Pendientes de corregir"],historial:["Historial de alertas","Alertas que ya fueron corregidas.","Alertas corregidas"]}[draTab];if(T){$("#alH").textContent=T[0];$("#alP").textContent=T[1];$("#alT").textContent=T[2]}if(draTab==="historial"){$("#alertForm").hidden=true;$("#vAlertas").scrollIntoView({behavior:"smooth",block:"start"})}}
+document.querySelectorAll("[data-dratab]").forEach(b=>b.onclick=()=>{draTab=b.dataset.dratab;applyDraTab();renderAlerts();loadAlerts()});
 
 
 // ---- Preferencias de notificaciones y correo ----
@@ -356,7 +367,7 @@ function dtag(f){const t=new Date();t.setHours(0,0,0,0);const n=Math.round((new 
 function ago(t){const m=String(t).match(/(\d+)\/(\d+)\/(\d+) (\d+):(\d+)/);if(!m)return"";const d=Math.round((Date.now()-new Date(m[3],m[2]-1,m[1],m[4],m[5]))/6e4);return d<1?"ahora":d<60?`hace ${d} min`:d<1440?`hace ${Math.floor(d/60)} h`:`hace ${Math.floor(d/1440)} d`}
 // ---- Vista asistentes ----
 function render(){if(role!=="asis")return;
-$("#vAlertas").hidden=tab!=="nueva";$("#vAsis").hidden=tab==="nueva";
+$("#vAlertas").hidden=tab!=="nueva";if(tab==="nueva"){$("#alH").textContent="Alertas de corrección";$("#alP").textContent="Avisa a la Dra. si falta algo o hay dudas en un formulario.";$("#alT").textContent="Historial de alertas"}$("#vAsis").hidden=tab==="nueva";
 document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
 if(tab==="nueva"){renderAlerts();return}
 const pend=DB.filter(r=>r.estado==="Pendiente").length;$("#cnt").textContent=pend?`(${pend})`:"";document.title=(pend?`(${pend}) `:"")+"Expedito";
@@ -393,14 +404,16 @@ up(r,{[k+"Estado"]:i.value,[k+"Resp"]:n},r.estado==="Completado"?"✓ Completado
 
 // ---- Alertas de corrección ----
 const ALERT_FORMS=G.flatMap(g=>g[1]);
-$("#alertFormSelect").insertAdjacentHTML("beforeend",ALERT_FORMS.map(f=>`<option value="${esc(f)}">${esc(f)}</option>`).join(""));
+$("#alertForms").innerHTML=G.map(g=>`<details class="card grp af"><summary><b>${g[0]}</b><span class="gc" data-af>0/${g[1].length}</span><span class="sp"></span><span class="chev">${ic("chev")}</span></summary><div class="gb">${g[1].map(f=>`<label class="opt"><input type="checkbox" name="af" value="${esc(f)}"><span>${esc(f)}</span></label>`).join("")}</div></details>`).join("");
+$("#alertForms").onchange=()=>document.querySelectorAll("#alertForms details").forEach(d=>{const n=d.querySelectorAll("[name=af]:checked").length,e=d.querySelector("[data-af]");e.textContent=n+"/"+d.querySelectorAll("[name=af]").length;e.classList.toggle("on",n>0)});
+$("#alertForm").addEventListener("reset",()=>setTimeout(()=>$("#alertForms").onchange()));
 async function getJson(url){try{const r=await fetch(url+"&t="+Date.now());return await r.json()}catch(e){return null}}
 async function loadAlerts(){try{const d=await fetch(API+"?tipo=alertas&t="+Date.now()).then(r=>r.json());if(Array.isArray(d))ALERTS=d;renderAlerts()}catch(e){}}
 
-function renderAlerts(){if(role!=="dra"&&role!=="asis")return;const host=$("#alertsList");if(!host)return;const list=ALERTS.slice().reverse();host.innerHTML=list.length?list.map(a=>`<div class="card alert-card ${a.estado==="Corregida"?"done":""}"><div class="row"><b class="exp">${esc(a.expediente)}</b><span class="sp"></span><span class="tag ${a.estado==="Corregida"?"lime":"co"}">${esc(a.estado)}</span></div><p class="mu s">Creada: ${esc(a.fecha)} · Por: <b>${esc(a.creador)}</b></p><p><b>Formulario:</b> ${esc(a.formularios)}</p><p><b>Pregunta por revisar:</b> ${esc(a.pregunta)}</p><p><b>Observaciones:</b> ${esc(a.observaciones)}</p>${a.respuesta?`<p><b>Respuesta de la Dra.:</b> ${esc(a.respuesta)}</p><p class="mu s">Corregida: ${esc(a.fechaResolucion||"")}</p>`:""}<div class="row" style="margin-top:10px">${role==="dra"&&a.estado!=="Corregida"?`<button class="ghost" data-alert-resolve="${esc(a.id)}">Marcar corregida</button>`:""}<span class="sp"></span><button class="ghost" data-alert-delete="${esc(a.id)}">Eliminar</button></div></div>`).join(""):'<div class="empty">Todavía no hay alertas de corrección.</div>';}
+function renderAlerts(){if(role!=="dra"&&role!=="asis")return;const host=$("#alertsList");if(!host)return;let list=ALERTS.slice().reverse();if(role==="dra")list=list.filter(a=>(a.estado==="Corregida")===(draTab==="historial"));host.innerHTML=list.length?list.map(a=>`<div class="card alert-card ${a.estado==="Corregida"?"done":""}"><div class="row"><b class="exp">${esc(a.expediente)}</b><span class="sp"></span><span class="tag ${a.estado==="Corregida"?"lime":"co"}">${esc(a.estado)}</span></div><p class="mu s">Creada: ${esc(a.fecha)} · Por: <b>${esc(a.creador)}</b></p><p><b>Formulario:</b> ${esc(a.formularios)}</p><p><b>Pregunta por revisar:</b> ${esc(a.pregunta)}</p><p><b>Observaciones:</b> ${esc(a.observaciones)}</p>${a.respuesta?`<p><b>Respuesta de la Dra.:</b> ${esc(a.respuesta)}</p><p class="mu s">Corregida: ${esc(a.fechaResolucion||"")}</p>`:""}<div class="row" style="margin-top:10px">${role==="dra"&&a.estado!=="Corregida"?`<button class="ghost" data-alert-resolve="${esc(a.id)}">Marcar corregida</button>`:""}<span class="sp"></span><button class="ghost" data-alert-delete="${esc(a.id)}">Eliminar</button></div></div>`).join(""):'<div class="empty">'+(role==="dra"&&draTab==="alertas"?"🎉 No hay alertas pendientes":"Todavía no hay alertas.")+'</div>';}
 $("#saveDraPrefs").onclick=async()=>{const email=$("#draEmail").value.trim().toLowerCase(),enabled=$("#draNotify").checked;if(enabled&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))return toast("Escriba un correo válido","err");await post({action:"setAlertPrefs",enabled,email});ALERT_PREFS={enabled,email};toast("Preferencias guardadas")};
 $("#cancelAlert").onclick=()=>{$("#alertForm").hidden=true};
-$("#alertForm").onsubmit=async e=>{e.preventDefault();const selected=$("#alertFormSelect").value,forms=selected?[selected]:[],email=$("#aCreatorEmail").value.trim().toLowerCase()||(role==="dra"?(localStorage.getItem("ms_dra_email")||$("#draEmail").value.trim().toLowerCase()):localStorage.getItem("ms_mail"))||"";if(!forms.length)return toast("Selecciona un formulario","err");if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))return toast("Escriba un correo válido para recibir la notificación","err");$("#aCreatorEmail").value=email;const data={action:"createAlert",id:"ALT-"+Date.now(),expediente:$("#aExp").value.trim().toUpperCase(),formularios:forms,pregunta:$("#aQuestion").value.trim(),observaciones:$("#aNotes").value.trim(),creador:$("#aCreator").value.trim(),email:email};if(!data.expediente||!data.pregunta||!data.observaciones||!data.creador)return toast("Complete todos los campos","err");const b=$("#sendAlert");b.disabled=true;b.textContent="Enviando…";await post(data);await new Promise(r=>setTimeout(r,800));await loadAlerts();const ok=ALERTS.some(a=>a.id===data.id);toast(ok?"Alerta enviada a la Dra. Lilliam":"No se pudo confirmar. Revise la conexión",ok?"":"err");if(ok){$("#alertForm").reset();$("#alertForm").hidden=true}b.disabled=false;b.textContent="Enviar alerta"};
+$("#alertForm").onsubmit=async e=>{e.preventDefault();const forms=[...document.querySelectorAll("[name=af]:checked")].map(x=>x.value),email=$("#aCreatorEmail").value.trim().toLowerCase()||(role==="dra"?(localStorage.getItem("ms_dra_email")||$("#draEmail").value.trim().toLowerCase()):localStorage.getItem("ms_mail"))||"";if(!forms.length)return toast("Selecciona un formulario","err");if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))return toast("Escriba un correo válido para recibir la notificación","err");$("#aCreatorEmail").value=email;const data={action:"createAlert",id:"ALT-"+Date.now(),expediente:$("#aExp").value.trim().toUpperCase(),formularios:forms,pregunta:$("#aQuestion").value.trim(),observaciones:$("#aNotes").value.trim(),creador:$("#aCreator").value.trim(),email:email};if(!data.expediente||!data.pregunta||!data.observaciones||!data.creador)return toast("Complete todos los campos","err");const b=$("#sendAlert");b.disabled=true;b.textContent="Enviando…";await post(data);await new Promise(r=>setTimeout(r,800));await loadAlerts();const ok=ALERTS.some(a=>a.id===data.id);toast(ok?"Alerta enviada a la Dra. Lilliam":"No se pudo confirmar. Revise la conexión",ok?"":"err");if(ok){$("#alertForm").reset();$("#alertForm").hidden=true}b.disabled=false;b.textContent="Enviar alerta"};
 $("#alertsList").onclick=async e=>{const r=e.target.closest("[data-alert-resolve],[data-alert-delete]");if(!r)return;const id=r.dataset.alertResolve||r.dataset.alertDelete;if(r.dataset.alertResolve){const respuesta=prompt("Anote brevemente qué se corrigió (opcional):")||"La Dra. Lilliam marcó la alerta como corregida.";await post({action:"resolveAlert",id,respuesta});toast("Alerta marcada como corregida; se notificará al asistente")}else{if(!confirm("¿Eliminar esta alerta del historial? Esta acción no se puede deshacer."))return;await post({action:"deleteAlert",id});toast("Alerta eliminada del historial")}await new Promise(r=>setTimeout(r,500));await loadAlerts()};
 
 document.querySelectorAll("[data-ic]").forEach(e=>e.insertAdjacentHTML("afterbegin",ic(e.dataset.ic)));
