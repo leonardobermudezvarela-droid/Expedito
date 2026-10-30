@@ -57,7 +57,7 @@ nav button b{display:grid;place-items:center;height:24px;margin-bottom:2px}nav b
 .stats b{display:block;font-size:22px;color:var(--pr)}.stats span{font-size:11px;color:var(--mu);font-weight:700}
 .tag.co{background:var(--co);color:#fff}
 .vis{display:flex;gap:8px;align-items:center;margin-top:10px}.vis input{flex:1;padding:9px 10px}
-body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(60% 40% at 0% 0%,#92228C38,transparent),radial-gradient(50% 35% at 100% 25%,#E67F5229,transparent),radial-gradient(60% 40% at 50% 100%,#B8C14C22,transparent)}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(60% 40% at 0% 0%,color-mix(in srgb,var(--pr) 22%,transparent),transparent),radial-gradient(50% 35% at 100% 25%,color-mix(in srgb,var(--co) 16%,transparent),transparent),radial-gradient(60% 40% at 50% 100%,color-mix(in srgb,var(--li) 13%,transparent),transparent)}
 .card,header,#menu{backdrop-filter:blur(16px) saturate(1.5);-webkit-backdrop-filter:blur(16px) saturate(1.5)}
 header small{white-space:nowrap}
 svg{width:20px;height:20px;flex:none}
@@ -66,7 +66,7 @@ svg{width:20px;height:20px;flex:none}
 .mi:hover{background:var(--soft)}.mi svg{color:var(--pr)}
 @keyframes up{from{opacity:0;transform:translateY(12px)}}
 @keyframes pop{from{opacity:0;transform:scale(.92) translateY(-6px)}}
-@keyframes glow{50%{box-shadow:0 0 0 1px var(--li) inset,0 0 18px #B8C14C66}}
+@keyframes glow{50%{box-shadow:0 0 0 1px var(--li) inset,0 0 18px color-mix(in srgb,var(--li) 40%,transparent)}}
 .card{animation:up .45s cubic-bezier(.2,.8,.2,1) both}
 .card:nth-child(2){animation-delay:.05s}.card:nth-child(3){animation-delay:.1s}.card:nth-child(4){animation-delay:.15s}
 .card.nw{animation:up .45s both,glow 2.2s ease-in-out 3}
@@ -90,17 +90,17 @@ select{width:100%;padding:10px;border-radius:12px;border:1px solid var(--bd);bac
 html{scroll-behavior:smooth}
 body,.card,header,nav{transition:background-color .35s,color .35s,border-color .35s}
 section:not([hidden]){animation:up .4s cubic-bezier(.2,.8,.2,1) both}
-.card{border-radius:22px}.card:hover{box-shadow:0 10px 30px #92228c14}
+.card{border-radius:22px}.card:hover{box-shadow:0 10px 30px color-mix(in srgb,var(--pr) 8%,transparent)}
 .hero{background-size:200% 200%;animation:up .45s both,shift 14s ease-in-out infinite}
 @keyframes shift{50%{background-position:100% 50%}}
-.btn{background:linear-gradient(135deg,var(--pr),var(--fu));box-shadow:0 8px 20px #92228c40}
-.btn:hover{transform:translateY(-1px);box-shadow:0 12px 26px #92228c50}
+.btn{background:linear-gradient(135deg,var(--pr),var(--fu));box-shadow:0 8px 20px color-mix(in srgb,var(--pr) 25%,transparent)}
+.btn:hover{transform:translateY(-1px);box-shadow:0 12px 26px color-mix(in srgb,var(--pr) 31%,transparent)}
 input,textarea,select{transition:border-color .2s,box-shadow .2s}
-input:focus,textarea:focus,select:focus{border-color:var(--pr);box-shadow:0 0 0 4px #92228c22}
+input:focus,textarea:focus,select:focus{border-color:var(--pr);box-shadow:0 0 0 4px color-mix(in srgb,var(--pr) 13%,transparent)}
 .opt{transition:border-color .2s,background .2s}.opt:has(input:checked){border-color:var(--pr);background:var(--soft)}
 nav{gap:2px}
 nav button{display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 2px 8px;position:relative}
-nav button.on{background:linear-gradient(135deg,#92228c26,#a93e7e1f)}
+nav button.on{background:linear-gradient(135deg,color-mix(in srgb,var(--pr) 15%,transparent),color-mix(in srgb,var(--fu) 12%,transparent))}
 nav button.on::after{content:"";position:absolute;bottom:3px;width:16px;height:3px;border-radius:3px;background:var(--pr);animation:pop .25s}
 .chip{transition:transform .2s}.chip:hover{transform:translateY(-1px)}
 #toast div{backdrop-filter:blur(10px);border-radius:16px}
@@ -122,15 +122,26 @@ nav button{padding:12px 2px}
 .ln{height:2px;flex:.4;background:repeating-linear-gradient(90deg,var(--bd) 0 6px,transparent 6px 12px)}
 .sum{grid-column:1/-1}.bar{height:10px;border-radius:99px;background:var(--soft);overflow:hidden;margin-top:10px}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--pr),var(--li));border-radius:99px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
-nav button.fab b{background:linear-gradient(135deg,var(--pr),var(--fu));color:#fff;width:48px;height:48px;border-radius:50%;margin:-24px 0 2px;box-shadow:0 8px 20px #92228c55}
+nav button.fab b{background:linear-gradient(135deg,var(--pr),var(--fu));color:#fff;width:48px;height:48px;border-radius:50%;margin:-24px 0 2px;box-shadow:0 8px 20px color-mix(in srgb,var(--pr) 33%,transparent)}
 nav button.fab.on{background:none}nav button.fab.on::after{display:none}
 @media (min-width:820px){nav button.fab b{margin:0 0 2px;width:44px;height:44px}}
+:root[data-c=salvia]{--bg:#f3f6f3;--card:#ffffffb8;--glass:#ffffffa6;--tx:#1f2a24;--mu:#66756b;--bd:#dde6df;--soft:#e8f0ea;--pr:#4f7d68;--fu:#6b9684;--li:#b9c9a3;--co:#d49a7a}
+:root[data-c=salvia][data-t=dark]{--bg:#0f1512;--card:#17211ca8;--glass:#0f1512b3;--tx:#e9f0ec;--mu:#93a69b;--bd:#26342d;--soft:#1d2b24;--pr:#6fa58b;--fu:#4f7d68;--li:#8aa06f;--co:#c98f70}
+:root[data-c=oceano]{--bg:#f2f5f9;--card:#ffffffb8;--glass:#ffffffa6;--tx:#1d2733;--mu:#64748b;--bd:#dce4ee;--soft:#e7eef7;--pr:#4a6fa5;--fu:#6b8fc0;--li:#a9c4c9;--co:#d6a07f}
+:root[data-c=oceano][data-t=dark]{--bg:#0e131a;--card:#161e29a8;--glass:#0e131ab3;--tx:#e8eef6;--mu:#8fa0b5;--bd:#243040;--soft:#1b2736;--pr:#6e93c9;--fu:#4a6fa5;--li:#86a8ad;--co:#c7936f}
+:root[data-c=arena]{--bg:#f7f4ef;--card:#ffffffb8;--glass:#ffffffa6;--tx:#2b2620;--mu:#7a6f62;--bd:#e8e0d3;--soft:#f0e9dd;--pr:#a0694b;--fu:#bf8a6c;--li:#c5c79a;--co:#c98a7a}
+:root[data-c=arena][data-t=dark]{--bg:#16120f;--card:#211b16a8;--glass:#16120fb3;--tx:#f2ebe2;--mu:#a99b8a;--bd:#33291f;--soft:#2a2118;--pr:#c68b6a;--fu:#a0694b;--li:#a3a577;--co:#b97d6e}
+.swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.sw{border:1px solid var(--bd);background:var(--card);border-radius:16px;padding:10px 4px;cursor:pointer;display:grid;justify-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--tx);transition:transform .15s,border-color .2s,box-shadow .2s}
+.sw i{width:34px;height:34px;border-radius:50%}.sw:active{transform:scale(.94)}
+.sw.on{border-color:var(--pr);box-shadow:0 0 0 3px color-mix(in srgb,var(--pr) 25%,transparent)}
+@media (min-width:820px){#asAlerts,#histAlerts{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;align-items:start}#asAlerts .card,#histAlerts .card{margin:0}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 .alert-form{display:grid;gap:12px}.alert-form textarea{min-height:82px}.alert-card{border-left:4px solid var(--co)}.alert-card.done{border-left-color:#2e9e5b}.fabplus{font-size:23px!important;font-weight:800!important;background:var(--pr)!important;color:white!important;min-width:48px;max-width:54px;flex:1.1!important}
 #cfg{position:relative}.settings-title{display:flex;align-items:center;gap:8px;margin-bottom:6px}.settings-section{border-top:1px solid var(--bd);padding-top:12px;margin-top:12px}
 .form-select{display:grid;gap:6px}.form-select select{padding:13px 14px;border-radius:14px}
-nav button{min-height:58px}nav button.on{box-shadow:0 2px 8px #92228c12}
+nav button{min-height:58px}nav button.on{box-shadow:0 2px 8px color-mix(in srgb,var(--pr) 7%,transparent)}
 </style>
 </head>
 <body>
@@ -157,6 +168,7 @@ nav button{min-height:58px}nav button.on{box-shadow:0 2px 8px #92228c12}
     <button class="ib" id="bTheme" title="Tema"></button>
     <button class="ib" id="bMenu" title="Menú" data-ic="more"></button>
     <div id="menu" hidden>
+      <button class="mi" id="bThemes"><span data-ic="palette"></span>Temas</button>
       <a class="mi" id="bSheet" href="#" target="_blank" rel="noopener" hidden><span data-ic="sheet"></span>Ver Excel en Drive</a>
       <button class="mi" id="bCfg" hidden><span data-ic="sliders"></span>Ajustes de avisos</button>
       <button class="mi" id="bInst" hidden><span data-ic="down"></span>Instalar app</button>
@@ -188,6 +200,11 @@ nav button{min-height:58px}nav button.on{box-shadow:0 2px 8px #92228c12}
   </div>
 
   <!-- VISTA LILLIAM -->
+  <div class="card" id="themeBox" hidden>
+    <b>Temas</b><p class="mu">Elige un estilo. Cada uno tiene versión de día y de noche.</p>
+    <div class="swatches" id="sw"></div>
+    <div class="tabs2" id="modeTabs" style="margin:12px 0 0"><button type="button" data-m="auto">Auto</button><button type="button" data-m="light">Día</button><button type="button" data-m="dark">Noche</button></div>
+  </div>
   <section id="vDra" hidden>
     <div class="card hero"><h2>Registrar reporte</h2><p>Indica el expediente y los formularios que se llenaron.</p></div>
     <form id="fDra">
@@ -226,7 +243,8 @@ nav button{min-height:58px}nav button.on{box-shadow:0 2px 8px #92228c12}
     <div class="tabs2" id="avTabs" hidden><button type="button" data-av="bd" class="on">Base de datos</button><button type="button" data-av="rc">RedCap</button></div>
     <div class="stats" id="stats"></div>
     <input type="search" id="q" placeholder="🔍 Buscar expediente o formulario" style="margin-bottom:12px">
-    <div id="list"></div>
+    <div class="tabs2" id="hsTabs" hidden><button type="button" data-hs="exp" class="on">Expedientes</button><button type="button" data-hs="al">Alertas</button></div>
+    <div id="list"></div><div id="asAlerts" hidden></div>
   </section>
   <section id="vHist" hidden>
     <div class="card hero"><h2>Historial</h2><p>Consulta las alertas corregidas y los reportes que has enviado.</p></div>
@@ -295,11 +313,11 @@ sheet:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 9h16M4 15h16
 sliders:'<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',
 down:'<path d="M12 3v12M7 11l5 5 5-5M5 21h14"/>',swap:'<path d="M17 3l4 4-4 4M21 7H8M7 21l-4-4 4-4M3 17h13"/>',
 out:'<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>',
-cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',check:'<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',chev:'<path d="M6 9l6 6 6-6"/>',plus:'<path d="M12 5v14M5 12h14"/>',flag:'<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'};
+cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',check:'<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',chev:'<path d="M6 9l6 6 6-6"/>',plus:'<path d="M12 5v14M5 12h14"/>',flag:'<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',palette:'<circle cx="12" cy="12" r="9"/><circle cx="8.5" cy="10" r="1"/><circle cx="12" cy="7.5" r="1"/><circle cx="15.5" cy="10" r="1"/>'};
 function ic(n){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+IC[n]+'</svg>'}
 // ---- Tema: por defecto el del dispositivo; si se cambia, se recuerda ----
 function theme(){const s=localStorage.getItem("ms_theme");const d=s?s==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
-document.documentElement.dataset.t=d?"dark":"light";$("meta[name=theme-color]").content=d?"#130f15":"#92228C";$("#bTheme").innerHTML=ic(d?"sun":"moon")}
+document.documentElement.dataset.t=d?"dark":"light";document.documentElement.dataset.c=localStorage.getItem("ms_color")||"ciruela";$("meta[name=theme-color]").content=getComputedStyle(document.documentElement).getPropertyValue("--bg").trim()||"#92228C";$("#bTheme").innerHTML=ic(d?"sun":"moon")}
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change",theme);
 $("#bTheme").onclick=()=>{localStorage.setItem("ms_theme",document.documentElement.dataset.t==="dark"?"light":"dark");theme()};
 theme();
@@ -334,7 +352,7 @@ function histUI(){document.querySelectorAll("[data-hm]").forEach(b=>b.classList.
 document.querySelectorAll("[data-hm]").forEach(b=>b.onclick=()=>{histMode=b.dataset.hm;histUI()});
 function applyDraTab(){if(role!=="dra")return;
 document.querySelectorAll("[data-dratab]").forEach(b=>b.classList.toggle("on",b.dataset.dratab===draTab));
-$("#vDra").hidden=draTab!=="reportes";$("#vAlertas").hidden=draTab!=="alertas";$("#vHist").hidden=draTab!=="historial";$("#vAvance").hidden=draTab!=="avance";$("#alertForm").hidden=true;
+$("#vDra").hidden=draTab!=="reportes";$("#vAlertas").hidden=draTab!=="alertas";$("#vHist").hidden=draTab!=="historial";$("#vAvance").hidden=draTab!=="avance";$("#alertForm").hidden=true;$("#alT").hidden=false;$("#alertsList").hidden=false;
 if(draTab==="alertas"){$("#alH").textContent="Alertas de corrección";$("#alP").textContent="Solicitudes de los asistentes por atender.";$("#alT").textContent="Pendientes de corregir"}
 histUI();window.scrollTo({top:0,behavior:"smooth"})}
 document.querySelectorAll("[data-dratab]").forEach(b=>b.onclick=()=>{draTab=b.dataset.dratab;applyDraTab();renderAlerts();loadAlerts()});
@@ -380,7 +398,14 @@ if(ok){$("#fDra").reset();$("#forms").hidden=false;$("#exp").focus()}b.disabled=
 
 function chk(r){return r.completos?"":'<p class="mu s"><span class="tag co">⚠ Formularios incompletos</span></p>'}
 function trk(r,edit){if(!/^(Pendiente|Completado)$/.test(r.estado))return"";return[["bd","Base de datos"],["rc","RedCap"]].map(([k,nm])=>{const e=r[k+"E"],p=r[k+"R"];return edit?`<div class="trk"><b>${nm}</b><select data-a="s" data-k="${k}" data-id="${esc(r.id)}">${["Sin iniciar","En proceso","Finalizado"].map(o=>`<option${o===e?" selected":""}>${o}</option>`).join("")}</select><input type="text" placeholder="¿Quién lo hace?" value="${esc(p)}" data-a="w" data-k="${k}" data-id="${esc(r.id)}"></div>`:`<p class="mu s">${nm}: <b>${e}</b>${p?" · "+esc(p):""}</p>`}).join("")}
-let avMode="bd";
+const TH=[["ciruela","Ciruela","#92228C","#A93E7E"],["salvia","Salvia","#4f7d68","#6b9684"],["oceano","Océano","#4a6fa5","#6b8fc0"],["arena","Arena","#a0694b","#bf8a6c"]];
+$("#sw").innerHTML=TH.map(t=>`<button type="button" class="sw" data-c="${t[0]}"><i style="background:linear-gradient(135deg,${t[2]},${t[3]})"></i>${t[1]}</button>`).join("");
+function thUI(){const c=localStorage.getItem("ms_color")||"ciruela",m=localStorage.getItem("ms_theme")||"auto";document.querySelectorAll(".sw").forEach(b=>b.classList.toggle("on",b.dataset.c===c));document.querySelectorAll("[data-m]").forEach(b=>b.classList.toggle("on",b.dataset.m===m))}
+$("#sw").onclick=e=>{const b=e.target.closest(".sw");if(!b)return;localStorage.setItem("ms_color",b.dataset.c);theme();thUI()};
+$("#modeTabs").onclick=e=>{const m=e.target.closest("[data-m]")?.dataset.m;if(!m)return;m==="auto"?localStorage.removeItem("ms_theme"):localStorage.setItem("ms_theme",m);theme();thUI()};
+$("#bThemes").onclick=()=>{$("#themeBox").hidden=!$("#themeBox").hidden;thUI()};
+let avMode="bd",hsMode="exp";
+document.querySelectorAll("[data-hs]").forEach(b=>b.onclick=()=>{hsMode=b.dataset.hs;document.querySelectorAll("[data-hs]").forEach(x=>x.classList.toggle("on",x===b));sig="";render()});
 function trkOne(r,k){const e=r[k+"E"],p=r[k+"R"];return `<div class="trk"><select data-a="s" data-k="${k}" data-id="${esc(r.id)}">${["Sin iniciar","En proceso","Finalizado"].map(o=>`<option${o===e?" selected":""}>${o}</option>`).join("")}</select><input type="text" placeholder="¿Quién lo hace?" value="${esc(p)}" data-a="w" data-k="${k}" data-id="${esc(r.id)}"></div>`}
 function avH(it){const nm=avMode==="bd"?"Base de datos":"RedCap",all=DB.filter(r=>/^(Pendiente|Completado)$/.test(r.estado)),done=all.filter(r=>r[avMode+"E"]==="Finalizado").length,pct=all.length?Math.round(done/all.length*100):0;
 return `<div class="card sum"><div class="row"><b>${nm}</b><span class="sp"></span><span class="mu">${done} de ${all.length} finalizados · ${pct}%</span></div><div class="bar"><i style="width:${pct}%"></i></div></div>`+(it.length?it.map(r=>{const e=r[avMode+"E"];return `<div class="card"><div class="row"><b class="exp">${esc(r.expediente)}</b><span class="sp"></span><span class="tag ${e==="Finalizado"?"st-a":e==="En proceso"?"co":""}">${esc(e)}</span></div>${trkOne(r,avMode)}</div>`}).join(""):'<div class="empty">Nada por aquí</div>')}
@@ -404,11 +429,11 @@ function ago(t){const m=String(t).match(/(\d+)\/(\d+)\/(\d+) (\d+):(\d+)/);if(!m
 // ---- Vista asistentes ----
 function render(){if(role!=="asis")return;
 $("#vAlertas").hidden=tab!=="nueva";if(tab==="nueva"){$("#alH").textContent="Crear alerta de corrección";$("#alP").textContent="Avisa a la Dra. si falta algo o hay dudas en un formulario.";$("#alT").textContent="Historial de alertas"}
-const HD={alertas:["Expedientes por localizar","Pendientes que registró la Dra. Lilliam."],visitas:["Próximas visitas","Participantes con visita programada."],historial:["Historial","Expedientes ya procesados."],avance:["Avance de trabajo","Marca en qué etapa va cada expediente."]}[tab];if(HD){$("#aH").textContent=HD[0];$("#aP").textContent=HD[1]}$("#vAsis").hidden=tab==="nueva";$("#avTabs").hidden=tab!=="avance";$("#stats").hidden=tab==="avance";
+const HD={alertas:["Expedientes por localizar","Pendientes que registró la Dra. Lilliam."],visitas:["Próximas visitas","Participantes con visita programada."],historial:["Historial","Expedientes ya procesados."],avance:["Avance de trabajo","Marca en qué etapa va cada expediente."]}[tab];if(HD){$("#aH").textContent=HD[0];$("#aP").textContent=HD[1]}$("#vAsis").hidden=tab==="nueva";$("#avTabs").hidden=tab!=="avance";$("#stats").hidden=tab==="avance";$("#hsTabs").hidden=tab!=="historial";{const ha=tab==="historial"&&hsMode==="al";$("#list").hidden=ha;$("#asAlerts").hidden=!ha;$("#alT").hidden=$("#alertsList").hidden=tab==="nueva";if(tab==="historial")renderAlerts()}
 document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
 if(tab==="nueva"){renderAlerts();return}
 const pend=DB.filter(r=>r.estado==="Pendiente").length;$("#cnt").textContent=pend?`(${pend})`:"";document.title=(pend?`(${pend}) `:"")+"Expedito";
-const q=$("#q").value.toLowerCase().trim(),s=JSON.stringify(DB)+tab+q+avMode;if(s===sig)return;if(document.activeElement?.matches("#list input,#list select"))return;sig=s;
+const q=$("#q").value.toLowerCase().trim(),s=JSON.stringify(DB)+tab+q+avMode+hsMode;if(s===sig)return;if(document.activeElement?.matches("#list input,#list select"))return;sig=s;
 document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
 const nue=DB.filter(r=>r.estado==="Pendiente"&&r.esNuevo).length,vis=DB.filter(r=>r.fechaVisita).length;
 $("#stats").innerHTML=`<button data-tab="alertas"><b>${pend}</b><span>Pendientes</span></button><button data-tab="alertas"><b>${nue}</b><span>Nuevas</span></button><button data-tab="visitas"><b>${vis}</b><span>Visitas</span></button>`;
@@ -447,7 +472,7 @@ $("#alertForm").addEventListener("reset",()=>setTimeout(()=>$("#alertForms").onc
 async function getJson(url){try{const r=await fetch(url+"&t="+Date.now());return await r.json()}catch(e){return null}}
 async function loadAlerts(){try{const d=await fetch(API+"?tipo=alertas&t="+Date.now()).then(r=>r.json());if(Array.isArray(d))ALERTS=d;renderAlerts()}catch(e){}}
 
-function renderAlerts(){if(role!=="dra"&&role!=="asis")return;const host=role==="dra"&&draTab==="historial"?$("#histAlerts"):$("#alertsList");if(!host)return;let list=ALERTS.slice().reverse();if(role==="dra")list=list.filter(a=>(a.estado==="Corregida")===(draTab==="historial"));host.innerHTML=list.length?list.map(a=>`<div class="card alert-card ${a.estado==="Corregida"?"done":""}"><div class="row"><b class="exp">${esc(a.expediente)}</b><span class="sp"></span><span class="tag ${a.estado==="Corregida"?"lime":"co"}">${esc(a.estado)}</span></div><p class="mu s">Creada: ${esc(a.fecha)} · Por: <b>${esc(a.creador)}</b></p><p><b>Formulario:</b> ${esc(a.formularios)}</p><p><b>Pregunta por revisar:</b> ${esc(a.pregunta)}</p><p><b>Observaciones:</b> ${esc(a.observaciones)}</p>${a.respuesta?`<p><b>Respuesta de la Dra.:</b> ${esc(a.respuesta)}</p><p class="mu s">Corregida: ${esc(a.fechaResolucion||"")}</p>`:""}<div class="row" style="margin-top:10px">${role==="dra"&&a.estado!=="Corregida"?`<button class="ghost" data-alert-resolve="${esc(a.id)}">Marcar corregida</button>`:""}<span class="sp"></span><button class="ghost" data-alert-delete="${esc(a.id)}">Eliminar</button></div></div>`).join(""):'<div class="empty">'+(role==="dra"&&draTab==="alertas"?"🎉 No hay alertas pendientes":"Todavía no hay alertas.")+'</div>';}
+function renderAlerts(){if(role!=="dra"&&role!=="asis")return;const host=role==="dra"&&draTab==="historial"?$("#histAlerts"):role==="asis"?$("#asAlerts"):$("#alertsList");if(!host)return;let list=ALERTS.slice().reverse();if(role==="dra")list=list.filter(a=>(a.estado==="Corregida")===(draTab==="historial"));host.innerHTML=list.length?list.map(a=>`<div class="card alert-card ${a.estado==="Corregida"?"done":""}"><div class="row"><b class="exp">${esc(a.expediente)}</b><span class="sp"></span><span class="tag ${a.estado==="Corregida"?"lime":"co"}">${esc(a.estado)}</span></div><p class="mu s">Creada: ${esc(a.fecha)} · Por: <b>${esc(a.creador)}</b></p><p><b>Formulario:</b> ${esc(a.formularios)}</p><p><b>Pregunta por revisar:</b> ${esc(a.pregunta)}</p><p><b>Observaciones:</b> ${esc(a.observaciones)}</p>${a.respuesta?`<p><b>Respuesta de la Dra.:</b> ${esc(a.respuesta)}</p><p class="mu s">Corregida: ${esc(a.fechaResolucion||"")}</p>`:""}<div class="row" style="margin-top:10px">${role==="dra"&&a.estado!=="Corregida"?`<button class="ghost" data-alert-resolve="${esc(a.id)}">Marcar corregida</button>`:""}<span class="sp"></span><button class="ghost" data-alert-delete="${esc(a.id)}">Eliminar</button></div></div>`).join(""):'<div class="empty">'+(role==="dra"&&draTab==="alertas"?"🎉 No hay alertas pendientes":"Todavía no hay alertas.")+'</div>';}
 $("#saveDraPrefs").onclick=async()=>{const email=$("#draEmail").value.trim().toLowerCase(),enabled=$("#draNotify").checked;if(enabled&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))return toast("Escriba un correo válido","err");await post({action:"setAlertPrefs",enabled,email});ALERT_PREFS={enabled,email};toast("Preferencias guardadas")};
 $("#cancelAlert").onclick=()=>{$("#alertForm").hidden=true};
 $("#alertForm").onsubmit=async e=>{e.preventDefault();const forms=[...document.querySelectorAll("[name=af]:checked")].map(x=>x.value),email=$("#aCreatorEmail").value.trim().toLowerCase()||(role==="dra"?(localStorage.getItem("ms_dra_email")||$("#draEmail").value.trim().toLowerCase()):localStorage.getItem("ms_mail"))||"";if(!forms.length)return toast("Selecciona un formulario","err");if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))return toast("Escriba un correo válido para recibir la notificación","err");$("#aCreatorEmail").value=email;const data={action:"createAlert",id:"ALT-"+Date.now(),expediente:$("#aExp").value.trim().toUpperCase(),formularios:forms,pregunta:$("#aQuestion").value.trim(),observaciones:$("#aNotes").value.trim(),creador:$("#aCreator").value.trim(),email:email};if(!data.expediente||!data.pregunta||!data.observaciones||!data.creador)return toast("Complete todos los campos","err");const b=$("#sendAlert");b.disabled=true;b.textContent="Enviando…";await post(data);await new Promise(r=>setTimeout(r,800));await loadAlerts();const ok=ALERTS.some(a=>a.id===data.id);toast(ok?"Alerta enviada a la Dra. Lilliam":"No se pudo confirmar. Revise la conexión",ok?"":"err");if(ok){$("#alertForm").reset();$("#alertForm").hidden=true}b.disabled=false;b.textContent="Enviar alerta"};
