@@ -120,6 +120,11 @@ nav button{padding:12px 2px}
 .flow{display:flex;align-items:center;gap:6px;margin-top:18px}.st{flex:1;text-align:center;font-size:12px;font-weight:700;color:var(--mu);display:grid;justify-items:center;gap:8px}
 .st i{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--soft);color:var(--pr);border:1px dashed var(--pr);opacity:.75}
 .ln{height:2px;flex:.4;background:repeating-linear-gradient(90deg,var(--bd) 0 6px,transparent 6px 12px)}
+.sum{grid-column:1/-1}.bar{height:10px;border-radius:99px;background:var(--soft);overflow:hidden;margin-top:10px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--pr),var(--li));border-radius:99px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+nav button.fab b{background:linear-gradient(135deg,var(--pr),var(--fu));color:#fff;width:48px;height:48px;border-radius:50%;margin:-24px 0 2px;box-shadow:0 8px 20px #92228c55}
+nav button.fab.on{background:none}nav button.fab.on::after{display:none}
+@media (min-width:820px){nav button.fab b{margin:0 0 2px;width:44px;height:44px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 .alert-form{display:grid;gap:12px}.alert-form textarea{min-height:82px}.alert-card{border-left:4px solid var(--co)}.alert-card.done{border-left-color:#2e9e5b}.fabplus{font-size:23px!important;font-weight:800!important;background:var(--pr)!important;color:white!important;min-width:48px;max-width:54px;flex:1.1!important}
@@ -218,6 +223,7 @@ nav button{min-height:58px}nav button.on{box-shadow:0 2px 8px #92228c12}
   <!-- VISTA ASISTENTES -->
   <section id="vAsis" hidden>
     <div class="card hero"><h2 id="aH">Expedientes por localizar</h2><p id="aP">Pendientes que registró la Dra. Lilliam.</p></div>
+    <div class="tabs2" id="avTabs" hidden><button type="button" data-av="bd" class="on">Base de datos</button><button type="button" data-av="rc">RedCap</button></div>
     <div class="stats" id="stats"></div>
     <input type="search" id="q" placeholder="🔍 Buscar expediente o formulario" style="margin-bottom:12px">
     <div id="list"></div>
@@ -251,8 +257,9 @@ nav button{min-height:58px}nav button.on{box-shadow:0 2px 8px #92228c12}
 </div>
 <nav id="nav" hidden>
   <button data-tab="alertas"><b data-ic="bell"></b>Alertas <span id="cnt"></span></button>
-  <button data-tab="nueva"><b data-ic="plus"></b>Crear</button>
   <button data-tab="visitas"><b data-ic="cal"></b>Visitas</button>
+  <button data-tab="nueva" class="fab"><b data-ic="plus"></b>Crear</button>
+  <button data-tab="avance"><b data-ic="chart"></b>Avance</button>
   <button data-tab="historial"><b data-ic="check"></b>Historial</button>
 </nav>
 <nav id="navDra" hidden>
@@ -373,6 +380,11 @@ if(ok){$("#fDra").reset();$("#forms").hidden=false;$("#exp").focus()}b.disabled=
 
 function chk(r){return r.completos?"":'<p class="mu s"><span class="tag co">⚠ Formularios incompletos</span></p>'}
 function trk(r,edit){if(!/^(Pendiente|Completado)$/.test(r.estado))return"";return[["bd","Base de datos"],["rc","RedCap"]].map(([k,nm])=>{const e=r[k+"E"],p=r[k+"R"];return edit?`<div class="trk"><b>${nm}</b><select data-a="s" data-k="${k}" data-id="${esc(r.id)}">${["Sin iniciar","En proceso","Finalizado"].map(o=>`<option${o===e?" selected":""}>${o}</option>`).join("")}</select><input type="text" placeholder="¿Quién lo hace?" value="${esc(p)}" data-a="w" data-k="${k}" data-id="${esc(r.id)}"></div>`:`<p class="mu s">${nm}: <b>${e}</b>${p?" · "+esc(p):""}</p>`}).join("")}
+let avMode="bd";
+function trkOne(r,k){const e=r[k+"E"],p=r[k+"R"];return `<div class="trk"><select data-a="s" data-k="${k}" data-id="${esc(r.id)}">${["Sin iniciar","En proceso","Finalizado"].map(o=>`<option${o===e?" selected":""}>${o}</option>`).join("")}</select><input type="text" placeholder="¿Quién lo hace?" value="${esc(p)}" data-a="w" data-k="${k}" data-id="${esc(r.id)}"></div>`}
+function avH(it){const nm=avMode==="bd"?"Base de datos":"RedCap",all=DB.filter(r=>/^(Pendiente|Completado)$/.test(r.estado)),done=all.filter(r=>r[avMode+"E"]==="Finalizado").length,pct=all.length?Math.round(done/all.length*100):0;
+return `<div class="card sum"><div class="row"><b>${nm}</b><span class="sp"></span><span class="mu">${done} de ${all.length} finalizados · ${pct}%</span></div><div class="bar"><i style="width:${pct}%"></i></div></div>`+(it.length?it.map(r=>{const e=r[avMode+"E"];return `<div class="card"><div class="row"><b class="exp">${esc(r.expediente)}</b><span class="sp"></span><span class="tag ${e==="Finalizado"?"st-a":e==="En proceso"?"co":""}">${esc(e)}</span></div>${trkOne(r,avMode)}</div>`}).join(""):'<div class="empty">Nada por aquí</div>')}
+document.querySelectorAll("[data-av]").forEach(b=>b.onclick=()=>{avMode=b.dataset.av;document.querySelectorAll("[data-av]").forEach(x=>x.classList.toggle("on",x===b));sig="";render()});
 function obsH(r){return r.obs.map(o=>`<p class="mu s">💬 ${esc(o)}</p>`).join("")}
 function cd(r){const z=n=>String(n).padStart(2,"0"),y=d=>""+d.getFullYear()+z(d.getMonth()+1)+z(d.getDate()),[a,b,c]=r.fechaVisita.split("-").map(Number);
 if(!r.horaVisita)return[y(new Date(a,b-1,c)),y(new Date(a,b-1,c+1))];const[H,M]=r.horaVisita.split(":").map(Number),t=d=>y(d)+"T"+z(d.getHours())+z(d.getMinutes())+"00";return[t(new Date(a,b-1,c,H,M)),t(new Date(a,b-1,c,H+1,M))]}
@@ -392,22 +404,22 @@ function ago(t){const m=String(t).match(/(\d+)\/(\d+)\/(\d+) (\d+):(\d+)/);if(!m
 // ---- Vista asistentes ----
 function render(){if(role!=="asis")return;
 $("#vAlertas").hidden=tab!=="nueva";if(tab==="nueva"){$("#alH").textContent="Crear alerta de corrección";$("#alP").textContent="Avisa a la Dra. si falta algo o hay dudas en un formulario.";$("#alT").textContent="Historial de alertas"}
-const HD={alertas:["Expedientes por localizar","Pendientes que registró la Dra. Lilliam."],visitas:["Próximas visitas","Participantes con visita programada."],historial:["Historial","Expedientes ya procesados."]}[tab];if(HD){$("#aH").textContent=HD[0];$("#aP").textContent=HD[1]}$("#vAsis").hidden=tab==="nueva";
+const HD={alertas:["Expedientes por localizar","Pendientes que registró la Dra. Lilliam."],visitas:["Próximas visitas","Participantes con visita programada."],historial:["Historial","Expedientes ya procesados."],avance:["Avance de trabajo","Marca en qué etapa va cada expediente."]}[tab];if(HD){$("#aH").textContent=HD[0];$("#aP").textContent=HD[1]}$("#vAsis").hidden=tab==="nueva";$("#avTabs").hidden=tab!=="avance";$("#stats").hidden=tab==="avance";
 document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
 if(tab==="nueva"){renderAlerts();return}
 const pend=DB.filter(r=>r.estado==="Pendiente").length;$("#cnt").textContent=pend?`(${pend})`:"";document.title=(pend?`(${pend}) `:"")+"Expedito";
-const q=$("#q").value.toLowerCase().trim(),s=JSON.stringify(DB)+tab+q;if(s===sig)return;if(document.activeElement?.matches("#list input,#list select"))return;sig=s;
+const q=$("#q").value.toLowerCase().trim(),s=JSON.stringify(DB)+tab+q+avMode;if(s===sig)return;if(document.activeElement?.matches("#list input,#list select"))return;sig=s;
 document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
 const nue=DB.filter(r=>r.estado==="Pendiente"&&r.esNuevo).length,vis=DB.filter(r=>r.fechaVisita).length;
 $("#stats").innerHTML=`<button data-tab="alertas"><b>${pend}</b><span>Pendientes</span></button><button data-tab="alertas"><b>${nue}</b><span>Nuevas</span></button><button data-tab="visitas"><b>${vis}</b><span>Visitas</span></button>`;
 let it=DB.slice().reverse().filter(r=>!q||(r.expediente+" "+r.formularios.join(" ")).toLowerCase().includes(q));
-it=tab==="alertas"?it.filter(r=>r.estado==="Pendiente"):tab==="visitas"?it.filter(r=>r.fechaVisita).sort((a,b)=>a.fechaVisita.localeCompare(b.fechaVisita)):it.filter(r=>r.estado!=="Pendiente");
-$("#list").innerHTML=it.length?it.map(r=>`<div class="card ${r.esNuevo&&r.estado==="Pendiente"?"nw":""}">
+it=tab==="avance"?it.filter(r=>/^(Pendiente|Completado)$/.test(r.estado)).sort((a,b)=>(a[avMode+"E"]==="Finalizado")-(b[avMode+"E"]==="Finalizado")):tab==="alertas"?it.filter(r=>r.estado==="Pendiente"):tab==="visitas"?it.filter(r=>r.fechaVisita).sort((a,b)=>a.fechaVisita.localeCompare(b.fechaVisita)):it.filter(r=>r.estado!=="Pendiente");
+$("#list").innerHTML=tab==="avance"?avH(it):it.length?it.map(r=>`<div class="card ${r.esNuevo&&r.estado==="Pendiente"?"nw":""}">
 <div class="row"><b class="exp">${esc(r.expediente)}</b>${r.esNuevo?'<span class="tag lime">NUEVA</span>':""}<span class="tag ${ec(r.estadoParticipante)}">${esc(r.estadoParticipante)}</span></div>
 ${forms(r)}
 ${r.fechaVisita?`<div class="vis">📅 <input type="date" value="${esc(r.fechaVisita)}" data-a="d" data-id="${esc(r.id)}"><input type="time" value="${esc(r.horaVisita)}" data-a="t" data-id="${esc(r.id)}">${dtag(r.fechaVisita)}<button class="ghost" data-a="x" data-id="${esc(r.id)}">Quitar</button></div><div class="row" style="margin-top:8px"><a class="ghost" target="_blank" rel="noopener" href="${esc(gcal(r))}">＋ Google Calendar</a><button class="ghost" data-a="c" data-id="${esc(r.id)}">＋ Apple / Outlook</button></div>`:""}${r.fechaLlegada?`<p class="mu">Llegada: ${esc(r.fechaLlegada)}</p>`:""}${r.notas?`<p class="mu">📝 ${esc(r.notas)}</p>`:""}
 <p class="mu s">${esc(r.timestamp)} · ${ago(r.timestamp)} · ${esc(r.estado)}</p>
-${chk(r)}${trk(r,r.estado==="Pendiente")}${obsH(r)}${r.estado==="Pendiente"?`<div class="row" style="margin-top:10px;flex-wrap:nowrap"><input type="text" id="o-${esc(r.id)}" placeholder="Observación de datos faltantes (opcional)"><button class="ghost" data-a="o" data-id="${esc(r.id)}">Enviar a la Dra.</button></div>`:`<div style="margin-top:10px"><button class="ghost" data-a="r" data-id="${esc(r.id)}">Regresar a pendiente</button></div>`}</div>`).join("")
+${chk(r)}${obsH(r)}${r.estado==="Pendiente"?`<div class="row" style="margin-top:10px;flex-wrap:nowrap"><input type="text" id="o-${esc(r.id)}" placeholder="Observación de datos faltantes (opcional)"><button class="ghost" data-a="o" data-id="${esc(r.id)}">Enviar a la Dra.</button></div>`:`<div style="margin-top:10px"><button class="ghost" data-a="r" data-id="${esc(r.id)}">Regresar a pendiente</button></div>`}</div>`).join("")
 :`<div class="empty">${tab==="alertas"?"🎉 No hay alertas pendientes":"Nada por aquí"}</div>`}
 $("#q").oninput=render;$("#stats").onclick=e=>{const t=e.target.closest("button")?.dataset.tab;if(t){tab=t;render()}};
 $("#nav").onclick=e=>{const t=e.target.closest("button")?.dataset.tab;if(t){tab=t;sig="";if(t==="nueva"){$("#alertForm").hidden=false;$("#alertForm").scrollIntoView({behavior:"smooth",block:"start"})}else $("#alertForm").hidden=true;render();loadAlerts()}};
