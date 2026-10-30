@@ -228,10 +228,6 @@ nav button{min-height:58px}nav button.on{box-shadow:0 2px 8px #92228c12}
     <input type="search" id="q" placeholder="🔍 Buscar expediente o formulario" style="margin-bottom:12px">
     <div id="list"></div>
   </section>
-  <section id="vVis" hidden>
-    <div class="card hero"><h2>Próximas visitas</h2><p>Participantes con visita programada.</p></div>
-    <div id="visList"></div>
-  </section>
   <section id="vHist" hidden>
     <div class="card hero"><h2>Historial</h2><p>Consulta las alertas corregidas y los reportes que has enviado.</p></div>
     <div class="tabs2"><button type="button" data-hm="alertas" class="on">Alertas corregidas</button><button type="button" data-hm="reportes">Reportes enviados</button></div>
@@ -268,8 +264,7 @@ nav button{min-height:58px}nav button.on{box-shadow:0 2px 8px #92228c12}
 </nav>
 <nav id="navDra" hidden>
   <button data-dratab="alertas"><b data-ic="bell"></b>Alertas</button>
-  <button data-dratab="visitas"><b data-ic="cal"></b>Visitas</button>
-  <button data-dratab="reportes" class="fab on"><b data-ic="plus"></b>Reportes</button>
+  <button data-dratab="reportes" class="on"><b data-ic="plus"></b>Reportes</button>
   <button data-dratab="avance"><b data-ic="chart"></b>Avance</button>
   <button data-dratab="historial"><b data-ic="check"></b>Historial</button>
 </nav>
@@ -339,7 +334,7 @@ function histUI(){document.querySelectorAll("[data-hm]").forEach(b=>b.classList.
 document.querySelectorAll("[data-hm]").forEach(b=>b.onclick=()=>{histMode=b.dataset.hm;histUI()});
 function applyDraTab(){if(role!=="dra")return;
 document.querySelectorAll("[data-dratab]").forEach(b=>b.classList.toggle("on",b.dataset.dratab===draTab));
-$("#vDra").hidden=draTab!=="reportes";$("#vAlertas").hidden=draTab!=="alertas";$("#vHist").hidden=draTab!=="historial";$("#vVis").hidden=draTab!=="visitas";$("#vAvance").hidden=draTab!=="avance";$("#alertForm").hidden=true;
+$("#vDra").hidden=draTab!=="reportes";$("#vAlertas").hidden=draTab!=="alertas";$("#vHist").hidden=draTab!=="historial";$("#vAvance").hidden=draTab!=="avance";$("#alertForm").hidden=true;
 if(draTab==="alertas"){$("#alH").textContent="Alertas de corrección";$("#alP").textContent="Solicitudes de los asistentes por atender.";$("#alT").textContent="Pendientes de corregir"}
 histUI();window.scrollTo({top:0,behavior:"smooth"})}
 document.querySelectorAll("[data-dratab]").forEach(b=>b.onclick=()=>{draTab=b.dataset.dratab;applyDraTab();renderAlerts();loadAlerts()});
@@ -402,10 +397,8 @@ G.forEach(g=>{const m=g[1].filter(f=>r.formularios.includes(f));if(!m.length)ret
 h+=`<details class="vd"${tab==="alertas"?" open":""}><summary><b>${g[0]}</b><span class="gc on">${m.length}</span><span class="sp"></span><span class="chev">${ic("chev")}</span></summary><div class="chips">${m.map(f=>`<span class="chip">${esc(f)}</span>`).join("")}</div></details>`});
 const o=r.formularios.filter(f=>!used.has(f));
 if(o.length)h+=`<div class="chips">${o.map(f=>`<span class="chip">${esc(f)}</span>`).join("")}</div>`;return h}
-function renderVis(){const it=DB.filter(r=>r.fechaVisita).sort((a,b)=>a.fechaVisita.localeCompare(b.fechaVisita));
-$("#visList").innerHTML=it.length?it.map(r=>`<div class="card"><div class="row"><b class="exp">${esc(r.expediente)}</b><span class="sp"></span>${r.horaVisita?`<span class="tag">${esc(r.horaVisita)}</span>`:""}${dtag(r.fechaVisita)}</div><p class="mu">📅 ${esc(r.fechaVisita)}</p></div>`).join(""):'<div class="empty">No hay visitas programadas</div>'}
-function renderRecent(){if(role!=="dra")return;renderVis();const it=DB.slice(-30).reverse();
-$("#recent").innerHTML=it.length?it.map(r=>`<div class="card"><div class="row"><b>${esc(r.expediente)}</b><span class="sp"></span><span class="tag ${r.estado==="Pendiente"?"co":""}">${r.estado==="Pendiente"?"Pendiente":"✓ "+esc(r.estado)}</span></div><p class="mu s">${esc(r.timestamp)}</p>${chk(r)}${obsH(r)}</div>`).join(""):'<div class="empty">Aún no hay envíos</div>'}
+function renderRecent(){if(role!=="dra")return;const it=DB.slice(-30).reverse();
+$("#recent").innerHTML=it.length?it.map(r=>`<div class="card"><div class="row"><b>${esc(r.expediente)}</b><span class="sp"></span><span class="tag ${r.estado==="Pendiente"?"co":""}">${r.estado==="Pendiente"?"Pendiente":"✓ "+esc(r.estado)}</span></div><p class="mu s">${esc(r.timestamp)}</p>${chk(r)}${trk(r,0)}${obsH(r)}</div>`).join(""):'<div class="empty">Aún no hay envíos</div>'}
 function dtag(f){const t=new Date();t.setHours(0,0,0,0);const n=Math.round((new Date(f+"T00:00:00")-t)/864e5);return n<0?'<span class="tag co">Vencida</span>':n===0?'<span class="tag lime">Hoy</span>':n===1?'<span class="tag">Mañana</span>':""}
 function ago(t){const m=String(t).match(/(\d+)\/(\d+)\/(\d+) (\d+):(\d+)/);if(!m)return"";const d=Math.round((Date.now()-new Date(m[3],m[2]-1,m[1],m[4],m[5]))/6e4);return d<1?"ahora":d<60?`hace ${d} min`:d<1440?`hace ${Math.floor(d/60)} h`:`hace ${Math.floor(d/1440)} d`}
 // ---- Vista asistentes ----
