@@ -115,6 +115,11 @@ nav button{padding:12px 2px}
 .stats{max-width:520px}#list .empty{grid-column:1/-1}
 }
 @media (min-width:1200px){.wrap{max-width:1280px}#list,#alertsList{grid-template-columns:repeat(3,1fr)}}
+.tabs2{display:flex;gap:6px;margin-bottom:12px;padding:5px;border:1px solid var(--bd);border-radius:99px;background:var(--card)}
+.tabs2 button{flex:1;border:0;background:none;padding:10px 6px;border-radius:99px;color:var(--mu);font-weight:700;font-size:13px;cursor:pointer;transition:background .25s,color .25s}.tabs2 button.on{background:var(--pr);color:#fff}
+.flow{display:flex;align-items:center;gap:6px;margin-top:18px}.st{flex:1;text-align:center;font-size:12px;font-weight:700;color:var(--mu);display:grid;justify-items:center;gap:8px}
+.st i{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--soft);color:var(--pr);border:1px dashed var(--pr);opacity:.75}
+.ln{height:2px;flex:.4;background:repeating-linear-gradient(90deg,var(--bd) 0 6px,transparent 6px 12px)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 .alert-form{display:grid;gap:12px}.alert-form textarea{min-height:82px}.alert-card{border-left:4px solid var(--co)}.alert-card.done{border-left-color:#2e9e5b}.fabplus{font-size:23px!important;font-weight:800!important;background:var(--pr)!important;color:white!important;min-width:48px;max-width:54px;flex:1.1!important}
@@ -207,14 +212,25 @@ nav button{min-height:58px}nav button.on{box-shadow:0 2px 8px #92228c12}
       </div>
       <button class="btn" id="send">Enviar reporte</button>
     </form>
-    <h3 style="margin:22px 0 10px">Últimos enviados</h3><div id="recent"></div>
+    
   </section>
 
   <!-- VISTA ASISTENTES -->
   <section id="vAsis" hidden>
+    <div class="card hero"><h2 id="aH">Expedientes por localizar</h2><p id="aP">Pendientes que registró la Dra. Lilliam.</p></div>
     <div class="stats" id="stats"></div>
     <input type="search" id="q" placeholder="🔍 Buscar expediente o formulario" style="margin-bottom:12px">
     <div id="list"></div>
+  </section>
+  <section id="vHist" hidden>
+    <div class="card hero"><h2>Historial</h2><p>Consulta las alertas corregidas y los reportes que has enviado.</p></div>
+    <div class="tabs2"><button type="button" data-hm="alertas" class="on">Alertas corregidas</button><button type="button" data-hm="reportes">Reportes enviados</button></div>
+    <div id="histAlerts"></div><div id="recent" hidden></div>
+  </section>
+  <section id="vAvance" hidden>
+    <div class="card hero"><h2>Avance del trabajo</h2><p>Aquí verás cómo van los registros de los asistentes.</p></div>
+    <div class="card"><span class="tag co">Próximamente</span><h3 style="margin:10px 0 4px">Seguimiento visual de cada expediente</h3><p class="mu">Podrás ver de un vistazo en qué etapa va cada registro: revisado, en la base de datos y en RedCap.</p>
+      <div class="flow"><div class="st"><i data-ic="check"></i>Formularios revisados</div><div class="ln"></div><div class="st"><i data-ic="sheet"></i>Base de datos</div><div class="ln"></div><div class="st"><i data-ic="down"></i>RedCap</div></div></div>
   </section>
   <section id="vAlertas" hidden>
     <div class="card hero"><h2 id="alH">Alertas de corrección</h2><p id="alP">Solicitudes para revisar formularios o preguntas de un expediente.</p></div>
@@ -243,6 +259,7 @@ nav button{min-height:58px}nav button.on{box-shadow:0 2px 8px #92228c12}
   <button data-dratab="reportes" class="on"><b data-ic="plus"></b>Reportes</button>
   <button data-dratab="alertas"><b data-ic="flag"></b>Alertas</button>
   <button data-dratab="historial"><b data-ic="clock"></b>Historial</button>
+  <button data-dratab="avance"><b data-ic="chart"></b>Avance</button>
 </nav>
 </div>
 
@@ -271,7 +288,7 @@ sheet:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 9h16M4 15h16
 sliders:'<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',
 down:'<path d="M12 3v12M7 11l5 5 5-5M5 21h14"/>',swap:'<path d="M17 3l4 4-4 4M21 7H8M7 21l-4-4 4-4M3 17h13"/>',
 out:'<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>',
-cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',check:'<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',chev:'<path d="M6 9l6 6 6-6"/>',plus:'<path d="M12 5v14M5 12h14"/>',flag:'<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'};
+cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',check:'<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',chev:'<path d="M6 9l6 6 6-6"/>',plus:'<path d="M12 5v14M5 12h14"/>',flag:'<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'};
 function ic(n){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+IC[n]+'</svg>'}
 // ---- Tema: por defecto el del dispositivo; si se cambia, se recuerda ----
 function theme(){const s=localStorage.getItem("ms_theme");const d=s?s==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
@@ -305,7 +322,14 @@ $("#bSwitch").onclick=()=>{role=role==="dra"?"asis":"dra";localStorage.setItem("
 function start(){$("#login").hidden=true;$("#app").hidden=false;bell();view();load();if(!timer)timer=setInterval(load,30000)}
 function view(){$("#bCfg").hidden=true;$("#bSheet").hidden=role!=="asis";$("#bSheet").href=SHEET;$("#vDra").hidden=role!=="dra";$("#vAsis").hidden=role!=="asis";$("#vAlertas").hidden=true;$("#navDra").hidden=role!=="dra";$("#nav").hidden=role!=="asis";$("#assistantNotifySettings").hidden=role!=="asis";$("#draNotifySettings").hidden=role!=="dra";
 $("#who").textContent=role==="dra"?"Dra. Lilliam":"Equipo asistente";sig="";render();renderRecent();loadAlerts();if(role==="dra"){loadAlertPrefs();applyDraTab()}} 
-function applyDraTab(){if(role!=="dra")return;document.querySelectorAll("[data-dratab]").forEach(b=>b.classList.toggle("on",b.dataset.dratab===draTab));$("#vDra").hidden=draTab!=="reportes";$("#vAlertas").hidden=draTab==="reportes";$("#alertForm").hidden=true;const T={alertas:["Alertas de corrección","Solicitudes de los asistentes por atender.","Pendientes de corregir"],historial:["Historial de alertas","Alertas que ya fueron corregidas.","Alertas corregidas"]}[draTab];if(T){$("#alH").textContent=T[0];$("#alP").textContent=T[1];$("#alT").textContent=T[2]}if(draTab==="historial"){$("#alertForm").hidden=true;$("#vAlertas").scrollIntoView({behavior:"smooth",block:"start"})}}
+let histMode="alertas";
+function histUI(){document.querySelectorAll("[data-hm]").forEach(b=>b.classList.toggle("on",b.dataset.hm===histMode));$("#histAlerts").hidden=histMode!=="alertas";$("#recent").hidden=histMode!=="reportes"}
+document.querySelectorAll("[data-hm]").forEach(b=>b.onclick=()=>{histMode=b.dataset.hm;histUI()});
+function applyDraTab(){if(role!=="dra")return;
+document.querySelectorAll("[data-dratab]").forEach(b=>b.classList.toggle("on",b.dataset.dratab===draTab));
+$("#vDra").hidden=draTab!=="reportes";$("#vAlertas").hidden=draTab!=="alertas";$("#vHist").hidden=draTab!=="historial";$("#vAvance").hidden=draTab!=="avance";$("#alertForm").hidden=true;
+if(draTab==="alertas"){$("#alH").textContent="Alertas de corrección";$("#alP").textContent="Solicitudes de los asistentes por atender.";$("#alT").textContent="Pendientes de corregir"}
+histUI();window.scrollTo({top:0,behavior:"smooth"})}
 document.querySelectorAll("[data-dratab]").forEach(b=>b.onclick=()=>{draTab=b.dataset.dratab;applyDraTab();renderAlerts();loadAlerts()});
 
 
@@ -361,13 +385,14 @@ G.forEach(g=>{const m=g[1].filter(f=>r.formularios.includes(f));if(!m.length)ret
 h+=`<details class="vd"${tab==="alertas"?" open":""}><summary><b>${g[0]}</b><span class="gc on">${m.length}</span><span class="sp"></span><span class="chev">${ic("chev")}</span></summary><div class="chips">${m.map(f=>`<span class="chip">${esc(f)}</span>`).join("")}</div></details>`});
 const o=r.formularios.filter(f=>!used.has(f));
 if(o.length)h+=`<div class="chips">${o.map(f=>`<span class="chip">${esc(f)}</span>`).join("")}</div>`;return h}
-function renderRecent(){if(role!=="dra")return;const it=DB.slice(-5).reverse();
+function renderRecent(){if(role!=="dra")return;const it=DB.slice(-30).reverse();
 $("#recent").innerHTML=it.length?it.map(r=>`<div class="card"><div class="row"><b>${esc(r.expediente)}</b><span class="sp"></span><span class="tag ${r.estado==="Pendiente"?"co":""}">${r.estado==="Pendiente"?"Pendiente":"✓ "+esc(r.estado)}</span></div><p class="mu s">${esc(r.timestamp)}</p>${chk(r)}${trk(r,0)}${obsH(r)}</div>`).join(""):'<div class="empty">Aún no hay envíos</div>'}
 function dtag(f){const t=new Date();t.setHours(0,0,0,0);const n=Math.round((new Date(f+"T00:00:00")-t)/864e5);return n<0?'<span class="tag co">Vencida</span>':n===0?'<span class="tag lime">Hoy</span>':n===1?'<span class="tag">Mañana</span>':""}
 function ago(t){const m=String(t).match(/(\d+)\/(\d+)\/(\d+) (\d+):(\d+)/);if(!m)return"";const d=Math.round((Date.now()-new Date(m[3],m[2]-1,m[1],m[4],m[5]))/6e4);return d<1?"ahora":d<60?`hace ${d} min`:d<1440?`hace ${Math.floor(d/60)} h`:`hace ${Math.floor(d/1440)} d`}
 // ---- Vista asistentes ----
 function render(){if(role!=="asis")return;
-$("#vAlertas").hidden=tab!=="nueva";if(tab==="nueva"){$("#alH").textContent="Alertas de corrección";$("#alP").textContent="Avisa a la Dra. si falta algo o hay dudas en un formulario.";$("#alT").textContent="Historial de alertas"}$("#vAsis").hidden=tab==="nueva";
+$("#vAlertas").hidden=tab!=="nueva";if(tab==="nueva"){$("#alH").textContent="Crear alerta de corrección";$("#alP").textContent="Avisa a la Dra. si falta algo o hay dudas en un formulario.";$("#alT").textContent="Historial de alertas"}
+const HD={alertas:["Expedientes por localizar","Pendientes que registró la Dra. Lilliam."],visitas:["Próximas visitas","Participantes con visita programada."],historial:["Historial","Expedientes ya procesados."]}[tab];if(HD){$("#aH").textContent=HD[0];$("#aP").textContent=HD[1]}$("#vAsis").hidden=tab==="nueva";
 document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
 if(tab==="nueva"){renderAlerts();return}
 const pend=DB.filter(r=>r.estado==="Pendiente").length;$("#cnt").textContent=pend?`(${pend})`:"";document.title=(pend?`(${pend}) `:"")+"Expedito";
@@ -410,7 +435,7 @@ $("#alertForm").addEventListener("reset",()=>setTimeout(()=>$("#alertForms").onc
 async function getJson(url){try{const r=await fetch(url+"&t="+Date.now());return await r.json()}catch(e){return null}}
 async function loadAlerts(){try{const d=await fetch(API+"?tipo=alertas&t="+Date.now()).then(r=>r.json());if(Array.isArray(d))ALERTS=d;renderAlerts()}catch(e){}}
 
-function renderAlerts(){if(role!=="dra"&&role!=="asis")return;const host=$("#alertsList");if(!host)return;let list=ALERTS.slice().reverse();if(role==="dra")list=list.filter(a=>(a.estado==="Corregida")===(draTab==="historial"));host.innerHTML=list.length?list.map(a=>`<div class="card alert-card ${a.estado==="Corregida"?"done":""}"><div class="row"><b class="exp">${esc(a.expediente)}</b><span class="sp"></span><span class="tag ${a.estado==="Corregida"?"lime":"co"}">${esc(a.estado)}</span></div><p class="mu s">Creada: ${esc(a.fecha)} · Por: <b>${esc(a.creador)}</b></p><p><b>Formulario:</b> ${esc(a.formularios)}</p><p><b>Pregunta por revisar:</b> ${esc(a.pregunta)}</p><p><b>Observaciones:</b> ${esc(a.observaciones)}</p>${a.respuesta?`<p><b>Respuesta de la Dra.:</b> ${esc(a.respuesta)}</p><p class="mu s">Corregida: ${esc(a.fechaResolucion||"")}</p>`:""}<div class="row" style="margin-top:10px">${role==="dra"&&a.estado!=="Corregida"?`<button class="ghost" data-alert-resolve="${esc(a.id)}">Marcar corregida</button>`:""}<span class="sp"></span><button class="ghost" data-alert-delete="${esc(a.id)}">Eliminar</button></div></div>`).join(""):'<div class="empty">'+(role==="dra"&&draTab==="alertas"?"🎉 No hay alertas pendientes":"Todavía no hay alertas.")+'</div>';}
+function renderAlerts(){if(role!=="dra"&&role!=="asis")return;const host=role==="dra"&&draTab==="historial"?$("#histAlerts"):$("#alertsList");if(!host)return;let list=ALERTS.slice().reverse();if(role==="dra")list=list.filter(a=>(a.estado==="Corregida")===(draTab==="historial"));host.innerHTML=list.length?list.map(a=>`<div class="card alert-card ${a.estado==="Corregida"?"done":""}"><div class="row"><b class="exp">${esc(a.expediente)}</b><span class="sp"></span><span class="tag ${a.estado==="Corregida"?"lime":"co"}">${esc(a.estado)}</span></div><p class="mu s">Creada: ${esc(a.fecha)} · Por: <b>${esc(a.creador)}</b></p><p><b>Formulario:</b> ${esc(a.formularios)}</p><p><b>Pregunta por revisar:</b> ${esc(a.pregunta)}</p><p><b>Observaciones:</b> ${esc(a.observaciones)}</p>${a.respuesta?`<p><b>Respuesta de la Dra.:</b> ${esc(a.respuesta)}</p><p class="mu s">Corregida: ${esc(a.fechaResolucion||"")}</p>`:""}<div class="row" style="margin-top:10px">${role==="dra"&&a.estado!=="Corregida"?`<button class="ghost" data-alert-resolve="${esc(a.id)}">Marcar corregida</button>`:""}<span class="sp"></span><button class="ghost" data-alert-delete="${esc(a.id)}">Eliminar</button></div></div>`).join(""):'<div class="empty">'+(role==="dra"&&draTab==="alertas"?"🎉 No hay alertas pendientes":"Todavía no hay alertas.")+'</div>';}
 $("#saveDraPrefs").onclick=async()=>{const email=$("#draEmail").value.trim().toLowerCase(),enabled=$("#draNotify").checked;if(enabled&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))return toast("Escriba un correo válido","err");await post({action:"setAlertPrefs",enabled,email});ALERT_PREFS={enabled,email};toast("Preferencias guardadas")};
 $("#cancelAlert").onclick=()=>{$("#alertForm").hidden=true};
 $("#alertForm").onsubmit=async e=>{e.preventDefault();const forms=[...document.querySelectorAll("[name=af]:checked")].map(x=>x.value),email=$("#aCreatorEmail").value.trim().toLowerCase()||(role==="dra"?(localStorage.getItem("ms_dra_email")||$("#draEmail").value.trim().toLowerCase()):localStorage.getItem("ms_mail"))||"";if(!forms.length)return toast("Selecciona un formulario","err");if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))return toast("Escriba un correo válido para recibir la notificación","err");$("#aCreatorEmail").value=email;const data={action:"createAlert",id:"ALT-"+Date.now(),expediente:$("#aExp").value.trim().toUpperCase(),formularios:forms,pregunta:$("#aQuestion").value.trim(),observaciones:$("#aNotes").value.trim(),creador:$("#aCreator").value.trim(),email:email};if(!data.expediente||!data.pregunta||!data.observaciones||!data.creador)return toast("Complete todos los campos","err");const b=$("#sendAlert");b.disabled=true;b.textContent="Enviando…";await post(data);await new Promise(r=>setTimeout(r,800));await loadAlerts();const ok=ALERTS.some(a=>a.id===data.id);toast(ok?"Alerta enviada a la Dra. Lilliam":"No se pudo confirmar. Revise la conexión",ok?"":"err");if(ok){$("#alertForm").reset();$("#alertForm").hidden=true}b.disabled=false;b.textContent="Enviar alerta"};
