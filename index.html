@@ -355,7 +355,7 @@ if(p==="bdalerta"&&(u==="lilliam"||u==="asistente")){role=u==="lilliam"?"dra":"a
 $("#bOut").onclick=()=>{localStorage.removeItem("ms_role");location.reload()};
 $("#bSwitch").onclick=()=>{role=role==="dra"?"asis":"dra";localStorage.setItem("ms_role",role);view()};
 function start(){$("#login").hidden=true;$("#app").hidden=false;bell();view();load();if(!timer)timer=setInterval(load,30000)}
-function view(){$("#bCfg").hidden=true;$("#bSheet").hidden=role!=="asis";$("#bSheet").href=SHEET;$("#vDra").hidden=role!=="dra";$("#vAsis").hidden=role!=="asis";$("#vAlertas").hidden=true;$("#navDra").hidden=role!=="dra";$("#nav").hidden=role!=="asis";$("#assistantNotifySettings").hidden=role!=="asis";$("#draNotifySettings").hidden=role!=="dra";
+function view(){{const vf=document.getElementById("vForm");if(vf)vf.hidden=true}$("#bCfg").hidden=true;$("#bSheet").hidden=role!=="asis";$("#bSheet").href=SHEET;$("#vDra").hidden=role!=="dra";$("#vAsis").hidden=role!=="asis";$("#vAlertas").hidden=true;$("#navDra").hidden=role!=="dra";$("#nav").hidden=role!=="asis";$("#assistantNotifySettings").hidden=role!=="asis";$("#draNotifySettings").hidden=role!=="dra";
 $("#who").textContent=role==="dra"?"Dra. Lilliam":"Equipo asistente";sig="";render();renderRecent();loadAlerts();if(role==="dra"){loadAlertPrefs();applyDraTab()}} 
 let histMode="alertas";
 function histUI(){document.querySelectorAll("[data-hm]").forEach(b=>b.classList.toggle("on",b.dataset.hm===histMode));$("#histAlerts").hidden=histMode!=="alertas";$("#recent").hidden=histMode!=="reportes"}
