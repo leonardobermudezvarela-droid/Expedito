@@ -86,12 +86,27 @@ nav button b{transition:transform .25s}nav button.on b{transform:translateY(-2px
 .vd summary{display:flex;align-items:center;gap:8px;padding:10px 0;cursor:pointer;list-style:none}.vd summary::-webkit-details-marker{display:none}
 .vd .chips{margin-top:0;padding-bottom:10px}
 select{width:100%;padding:10px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}input[type=time]{padding:13px 10px;border-radius:14px;border:1px solid var(--bd);background:var(--bg);outline:none}.trk{display:grid;grid-template-columns:78px 1fr 1fr;gap:6px;align-items:center;margin-top:8px}.trk b{font-size:12px}.trk input{padding:10px}a.ghost{text-decoration:none;display:inline-block}
+/* ===== Pulido visual ===== */
+html{scroll-behavior:smooth}
+body,.card,header,nav{transition:background-color .35s,color .35s,border-color .35s}
+section:not([hidden]){animation:up .4s cubic-bezier(.2,.8,.2,1) both}
+.card{border-radius:22px}.card:hover{box-shadow:0 10px 30px #92228c14}
+.hero{background-size:200% 200%;animation:up .45s both,shift 14s ease-in-out infinite}
+@keyframes shift{50%{background-position:100% 50%}}
+.btn{background:linear-gradient(135deg,var(--pr),var(--fu));box-shadow:0 8px 20px #92228c40}
+.btn:hover{transform:translateY(-1px);box-shadow:0 12px 26px #92228c50}
+input,textarea,select{transition:border-color .2s,box-shadow .2s}
+input:focus,textarea:focus,select:focus{border-color:var(--pr);box-shadow:0 0 0 4px #92228c22}
+.opt{transition:border-color .2s,background .2s}.opt:has(input:checked){border-color:var(--pr);background:var(--soft)}
+nav{gap:2px}
+nav button{display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 2px 8px;position:relative}
+nav button.on{background:linear-gradient(135deg,#92228c26,#a93e7e1f)}
+nav button.on::after{content:"";position:absolute;bottom:3px;width:16px;height:3px;border-radius:3px;background:var(--pr);animation:pop .25s}
+.chip{transition:transform .2s}.chip:hover{transform:translateY(-1px)}
+#toast div{backdrop-filter:blur(10px);border-radius:16px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 .alert-form{display:grid;gap:12px}.alert-form textarea{min-height:82px}.alert-card{border-left:4px solid var(--co)}.alert-card.done{border-left-color:#2e9e5b}.fabplus{font-size:23px!important;font-weight:800!important;background:var(--pr)!important;color:white!important;min-width:48px;max-width:54px;flex:1.1!important}
-.dra-island{display:flex;gap:5px;padding:6px;margin:0 0 16px;border:1px solid var(--bd);border-radius:999px;background:var(--card);box-shadow:0 8px 25px #0001;position:sticky;top:74px;z-index:4;backdrop-filter:blur(16px)}
-.dra-island button{flex:1;min-width:0;border:0;background:transparent;color:var(--mu);border-radius:999px;padding:11px 5px;font-size:12px;font-weight:750;cursor:pointer}
-.dra-island button.on{background:var(--soft);color:var(--pr);box-shadow:0 2px 8px #92228c12}
 #cfg{position:relative}.settings-title{display:flex;align-items:center;gap:8px;margin-bottom:6px}.settings-section{border-top:1px solid var(--bd);padding-top:12px;margin-top:12px}
 .form-select{display:grid;gap:6px}.form-select select{padding:13px 14px;border-radius:14px}
 nav button{min-height:58px}nav button.on{box-shadow:0 2px 8px #92228c12}
@@ -123,19 +138,12 @@ nav button{min-height:58px}nav button.on{box-shadow:0 2px 8px #92228c12}
     <div id="menu" hidden>
       <a class="mi" id="bSheet" href="#" target="_blank" rel="noopener" hidden><span data-ic="sheet"></span>Ver Excel en Drive</a>
       <button class="mi" id="bCfg" hidden><span data-ic="sliders"></span>Ajustes de avisos</button>
-      <button class="mi" id="bAlertPage"><span data-ic="bell"></span>Alertas de corrección</button>
-      <button class="mi" id="bBackDra" hidden>Volver a registrar reportes</button>
       <button class="mi" id="bInst" hidden><span data-ic="down"></span>Instalar app</button>
       <button class="mi" id="bSwitch"><span data-ic="swap"></span>Cambiar vista</button>
       <button class="mi" id="bOut"><span data-ic="out"></span>Salir</button>
     </div>
   </header>
   <div class="tip" id="iosTip" hidden>Para instalar en iPhone: toca <b>Compartir</b> ⬆️ y luego <b>«Agregar a inicio»</b>. <button class="ghost" id="iosX">Cerrar</button></div>
-  <div class="dra-island" id="draIsland" hidden aria-label="Secciones de la Dra. Lilliam">
-    <button type="button" data-dratab="reportes" class="on">＋ Reportes</button>
-    <button type="button" data-dratab="alertas">♧ Alertas</button>
-    <button type="button" data-dratab="historial">◷ Historial</button>
-  </div>
 
   <div class="card" id="cfg" hidden>
     <div class="settings-title"><span data-ic="bell"></span><b>Notificaciones y preferencias</b></div>
@@ -216,9 +224,14 @@ nav button{min-height:58px}nav button.on{box-shadow:0 2px 8px #92228c12}
 </div>
 <nav id="nav" hidden>
   <button data-tab="alertas"><b data-ic="bell"></b>Alertas <span id="cnt"></span></button>
-  <button data-tab="nueva"><b>＋</b>Crear</button>
+  <button data-tab="nueva"><b data-ic="plus"></b>Crear</button>
   <button data-tab="visitas"><b data-ic="cal"></b>Visitas</button>
   <button data-tab="historial"><b data-ic="check"></b>Historial</button>
+</nav>
+<nav id="navDra" hidden>
+  <button data-dratab="reportes" class="on"><b data-ic="plus"></b>Reportes</button>
+  <button data-dratab="alertas"><b data-ic="flag"></b>Alertas</button>
+  <button data-dratab="historial"><b data-ic="clock"></b>Historial</button>
 </nav>
 </div>
 
@@ -247,7 +260,7 @@ sheet:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 9h16M4 15h16
 sliders:'<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',
 down:'<path d="M12 3v12M7 11l5 5 5-5M5 21h14"/>',swap:'<path d="M17 3l4 4-4 4M21 7H8M7 21l-4-4 4-4M3 17h13"/>',
 out:'<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>',
-cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',check:'<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',chev:'<path d="M6 9l6 6 6-6"/>'};
+cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',check:'<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',chev:'<path d="M6 9l6 6 6-6"/>',plus:'<path d="M12 5v14M5 12h14"/>',flag:'<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'};
 function ic(n){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+IC[n]+'</svg>'}
 // ---- Tema: por defecto el del dispositivo; si se cambia, se recuerda ----
 function theme(){const s=localStorage.getItem("ms_theme");const d=s?s==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
@@ -279,10 +292,10 @@ if(p==="bdalerta"&&(u==="lilliam"||u==="asistente")){role=u==="lilliam"?"dra":"a
 $("#bOut").onclick=()=>{localStorage.removeItem("ms_role");location.reload()};
 $("#bSwitch").onclick=()=>{role=role==="dra"?"asis":"dra";localStorage.setItem("ms_role",role);view()};
 function start(){$("#login").hidden=true;$("#app").hidden=false;bell();view();load();if(!timer)timer=setInterval(load,30000)}
-function view(){$("#bCfg").hidden=true;$("#bSheet").hidden=role!=="asis";$("#bSheet").href=SHEET;$("#vDra").hidden=role!=="dra";$("#vAsis").hidden=role!=="asis";$("#vAlertas").hidden=true;$("#draIsland").hidden=role!=="dra";$("#bBackDra").hidden=true;$("#nav").hidden=role!=="asis";$("#assistantNotifySettings").hidden=role!=="asis";$("#draNotifySettings").hidden=role!=="dra";
+function view(){$("#bCfg").hidden=true;$("#bSheet").hidden=role!=="asis";$("#bSheet").href=SHEET;$("#vDra").hidden=role!=="dra";$("#vAsis").hidden=role!=="asis";$("#vAlertas").hidden=true;$("#navDra").hidden=role!=="dra";$("#nav").hidden=role!=="asis";$("#assistantNotifySettings").hidden=role!=="asis";$("#draNotifySettings").hidden=role!=="dra";
 $("#who").textContent=role==="dra"?"Dra. Lilliam":"Equipo asistente";sig="";render();renderRecent();loadAlerts();if(role==="dra"){loadAlertPrefs();applyDraTab()}} 
-function applyDraTab(){if(role!=="dra")return;document.querySelectorAll("[data-dratab]").forEach(b=>b.classList.toggle("on",b.dataset.dratab===draTab));$("#vDra").hidden=draTab!=="reportes";$("#vAlertas").hidden=draTab==="reportes";$("#alertForm").hidden=draTab!=="alertas";const h=$("#vAlertas").querySelector("h3");if(h)h.textContent=draTab==="historial"?"Historial de alertas":"Alertas de corrección";if(draTab==="historial"){$("#alertForm").hidden=true;$("#vAlertas").scrollIntoView({behavior:"smooth",block:"start"})}}
-document.querySelectorAll("[data-dratab]").forEach(b=>b.onclick=()=>{draTab=b.dataset.dratab;applyDraTab();if(draTab==="alertas"){$("#alertForm").hidden=false}loadAlerts()});
+function applyDraTab(){if(role!=="dra")return;document.querySelectorAll("[data-dratab]").forEach(b=>b.classList.toggle("on",b.dataset.dratab===draTab));$("#vDra").hidden=draTab!=="reportes";$("#vAlertas").hidden=draTab==="reportes";$("#alertForm").hidden=true;const h=$("#vAlertas").querySelector("h3");if(h)h.textContent=draTab==="historial"?"Historial de alertas":"Alertas de corrección";if(draTab==="historial"){$("#alertForm").hidden=true;$("#vAlertas").scrollIntoView({behavior:"smooth",block:"start"})}}
+document.querySelectorAll("[data-dratab]").forEach(b=>b.onclick=()=>{draTab=b.dataset.dratab;applyDraTab();loadAlerts()});
 
 
 // ---- Preferencias de notificaciones y correo ----
@@ -391,8 +404,6 @@ $("#alertForm").onsubmit=async e=>{e.preventDefault();const selected=$("#alertFo
 $("#alertsList").onclick=async e=>{const r=e.target.closest("[data-alert-resolve],[data-alert-delete]");if(!r)return;const id=r.dataset.alertResolve||r.dataset.alertDelete;if(r.dataset.alertResolve){const respuesta=prompt("Anote brevemente qué se corrigió (opcional):")||"La Dra. Lilliam marcó la alerta como corregida.";await post({action:"resolveAlert",id,respuesta});toast("Alerta marcada como corregida; se notificará al asistente")}else{if(!confirm("¿Eliminar esta alerta del historial? Esta acción no se puede deshacer."))return;await post({action:"deleteAlert",id});toast("Alerta eliminada del historial")}await new Promise(r=>setTimeout(r,500));await loadAlerts()};
 
 document.querySelectorAll("[data-ic]").forEach(e=>e.insertAdjacentHTML("afterbegin",ic(e.dataset.ic)));
-$("#bAlertPage").onclick=e=>{e.preventDefault();e.stopPropagation();$("#menu").hidden=true;if(role==="dra"){draTab="alertas";applyDraTab();$("#alertForm").hidden=false}else{tab="nueva";sig="";render();$("#alertForm").hidden=false}loadAlerts()};
-$("#bBackDra").onclick=e=>{e.preventDefault();e.stopPropagation();$("#menu").hidden=true;$("#vAlertas").hidden=true;$("#vDra").hidden=false};
 $("#bMenu").onclick=e=>{e.stopPropagation();$("#menu").hidden=!$("#menu").hidden};
 addEventListener("click",()=>{$("#menu").hidden=true});
 if(role)start();
